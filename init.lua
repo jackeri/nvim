@@ -593,7 +593,11 @@ vim.wo.scrolloff = 90
 vim.api.nvim_create_autocmd({ "BufReadPost" }, {
   pattern = { "*" },
   callback = function()
-    vim.api.nvim_exec('silent! normal! g`"zv', false)
+    -- do not restore cursor when doing a git commit
+    -- the GIT_AUTHOR_EMAIL env variable should only be set when doing a git command
+    if vim.env.GIT_AUTHOR_EMAIL == nil then
+      vim.api.nvim_exec2('silent! normal! g`"zv', { output = false })
+    end
   end,
 })
 
