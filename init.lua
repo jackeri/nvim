@@ -572,6 +572,7 @@ cmp.setup {
   },
 }
 
+-- reload this vim configuration without the need to restart the whole editor
 local function reload_vim_config()
   for name,_ in pairs(package.loaded) do
     if name:match('^user') and not name:match('nvim-tree') then
@@ -583,6 +584,10 @@ local function reload_vim_config()
   vim.notify("Nvim configuration reloaded!", vim.log.levels.INFO)
 end
 vim.keymap.set('n', '<leader>vrc', reload_vim_config, { desc = '[V]im [R]reload [C]onfig'})
+
+-- enable relative line nubmers and center the cursor location
+vim.wo.relativenumber = true
+vim.wo.scrolloff = 90
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
