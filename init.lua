@@ -589,5 +589,13 @@ vim.keymap.set('n', '<leader>vrc', reload_vim_config, { desc = '[V]im [R]reload 
 vim.wo.relativenumber = true
 vim.wo.scrolloff = 90
 
+-- Restore cursor position
+vim.api.nvim_create_autocmd({ "BufReadPost" }, {
+  pattern = { "*" },
+  callback = function()
+    vim.api.nvim_exec('silent! normal! g`"zv', false)
+  end,
+})
+
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
