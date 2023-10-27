@@ -215,6 +215,14 @@ require('lazy').setup({
     build = ':TSUpdate',
   },
 
+  {
+    'numToStr/Comment.nvim',
+    opts = {
+      -- add any options here
+    },
+    lazy = false,
+  }
+
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
   --       Uncomment any of the lines below to enable them.
@@ -456,6 +464,8 @@ require('which-key').register {
   ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
   ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
   ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
+  ['<leader>v'] = { name = '[V]im', _ = 'which_key_ignore' },
+  ['<leader>vr'] = { name = '[V]im [R]reload', _ = 'which_key_ignore' },
 }
 
 -- mason-lspconfig requires that these setup functions are called in this order
@@ -472,12 +482,12 @@ require('mason-lspconfig').setup()
 --  If you want to override the default filetypes that your language server will attach to you can
 --  define the property 'filetypes' to the map in question.
 local servers = {
-  -- clangd = {},
+  clangd = {},
   -- gopls = {},
   -- pyright = {},
-  -- rust_analyzer = {},
-  -- tsserver = {},
-  -- html = { filetypes = { 'html', 'twig', 'hbs'} },
+  rust_analyzer = {},
+  tsserver = {},
+  html = { filetypes = { 'html', 'twig', 'hbs'} },
 
   lua_ls = {
     Lua = {
@@ -485,6 +495,8 @@ local servers = {
       telemetry = { enable = false },
     },
   },
+
+  volar = { filetypes = { 'vue' } }
 }
 
 -- Setup neovim lua configuration
@@ -559,6 +571,18 @@ cmp.setup {
     { name = 'luasnip' },
   },
 }
+
+local function reload_vim_config()
+  for name,_ in pairs(package.loaded) do
+    if name:match('^user') and not name:match('nvim-tree') then
+      package.loaded[name] = nil
+    end
+  end
+
+  dofile(vim.env.MYVIMRC)
+  vim.notify("Nvim configuration reloaded!", vim.log.levels.INFO)
+end
+vim.keymap.set('n', '<leader>vrc', reload_vim_config, { desc = '[V]im [R]reload [C]onfig'})
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
