@@ -196,12 +196,7 @@ require('lazy').setup({
       -- requirements installed.
       {
         'nvim-telescope/telescope-fzf-native.nvim',
-        -- NOTE: If you are having trouble with this installation,
-        --       refer to the README for telescope-fzf-native for more instructions.
-        build = 'make',
-        cond = function()
-          return vim.fn.executable 'make' == 1
-        end,
+        build = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build'
       },
     },
   },
@@ -587,7 +582,7 @@ vim.keymap.set('n', '<leader>vrc', reload_vim_config, { desc = '[V]im [R]reload 
 
 -- enable relative line nubmers and center the cursor location
 vim.wo.relativenumber = true
-vim.wo.scrolloff = 90
+vim.wo.scrolloff = 10
 
 -- Restore cursor position
 vim.api.nvim_create_autocmd({ "BufReadPost" }, {
