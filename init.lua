@@ -585,10 +585,12 @@ vim.keymap.set('n', '<leader>vrc', reload_vim_config, { desc = '[V]im [R]reload 
 -- enable relative line nubmers and center the cursor location
 vim.wo.relativenumber = true
 vim.wo.scrolloff = 10
+vim.opt.tabstop = 4
+vim.opt.expandtab = false
 
 -- Restore cursor position
 vim.api.nvim_create_autocmd({ "BufReadPost" }, {
-  pattern = { "*" },
+  pattern = '*',
   callback = function()
     -- do not restore cursor when doing a git commit
     -- the GIT_AUTHOR_EMAIL env variable should only be set when doing a git command
