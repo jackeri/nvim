@@ -217,8 +217,9 @@ require('lazy').setup({
       -- add any options here
     },
     lazy = false,
-  }
+  },
 
+  { 'mg979/vim-visual-multi' }
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
   --       Uncomment any of the lines below to enable them.
@@ -463,6 +464,7 @@ require('which-key').register {
   ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
   ['<leader>v'] = { name = '[V]im', _ = 'which_key_ignore' },
   ['<leader>vr'] = { name = '[V]im [R]reload', _ = 'which_key_ignore' },
+  ['C-n'] = { name = 'Multicursor select word', _ = 'which_key_ignore' },
 }
 
 -- mason-lspconfig requires that these setup functions are called in this order
