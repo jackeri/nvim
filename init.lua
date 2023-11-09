@@ -219,7 +219,14 @@ require('lazy').setup({
     lazy = false,
   },
 
-  { 'mg979/vim-visual-multi' }
+  { 'mg979/vim-visual-multi' },
+
+  {
+    'ggandor/leap.nvim',
+    dependencies = {
+      'tpope/vim-repeat'
+    }
+  }
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
   --       Uncomment any of the lines below to enable them.
@@ -610,6 +617,9 @@ if vim.lsp.inlay_hint then
     end,
     { desc = 'Toggle f[u]nction inlay [H]ints' })
 end
+
+-- Leap configiration (use the defaults for now)
+require('leap').add_default_mappings()
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
