@@ -592,11 +592,16 @@ end
 vim.keymap.set('n', '<leader>vrc', reload_vim_config, { desc = '[V]im [R]reload [C]onfig' })
 
 -- enable relative line nubmers and center the cursor location
-vim.wo.relativenumber = true
-vim.wo.scrolloff = 10
-vim.opt.tabstop = 4
-vim.opt.expandtab = false
-vim.opt.shiftwidth = 4
+local g = vim.g
+local wo = vim.wo
+local bo = vim.bo
+
+local TAB_WIDTH = 4
+wo.relativenumber = true
+wo.scrolloff = 10
+bo.tabstop = TAB_WIDTH
+bo.expandtab = false
+bo.shiftwidth = TAB_WIDTH
 
 -- Restore cursor position
 vim.api.nvim_create_autocmd({ "BufReadPost" }, {
