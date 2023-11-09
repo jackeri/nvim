@@ -197,7 +197,7 @@ require('lazy').setup({
       {
         'nvim-telescope/telescope-fzf-native.nvim',
         build =
-        'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build'
+          'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build'
       },
     },
   },
@@ -596,6 +596,7 @@ vim.wo.relativenumber = true
 vim.wo.scrolloff = 10
 vim.opt.tabstop = 4
 vim.opt.expandtab = false
+vim.opt.shiftwidth = 4
 
 -- Restore cursor position
 vim.api.nvim_create_autocmd({ "BufReadPost" }, {
@@ -611,15 +612,22 @@ vim.api.nvim_create_autocmd({ "BufReadPost" }, {
 
 if vim.lsp.inlay_hint then
   vim.keymap.set('n', '<leader>uh', function()
-      -- First is the buffer which to use, it could be fetched with: nvim.api.nvim_get_current_buf(). 0 value uses current buffer
-      -- the second param is a bool if to enable or disable the hints (nil will toggle the hints)
-      vim.lsp.inlane_hint(0, nil)
-    end,
-    { desc = 'Toggle f[u]nction inlay [H]ints' })
+    -- First is the buffer which to use, it could be fetched with: nvim.api.nvim_get_current_buf(). 0 value uses current buffer
+    -- the second param is a bool if to enable or disable the hints (nil will toggle the hints)
+    vim.lsp.inlane_hint(0, nil)
+  end, { desc = 'Toggle f[u]nction inlay [H]ints' })
 end
 
 -- Leap configiration (use the defaults for now)
 require('leap').add_default_mappings()
+
+local function toggle_listchars()
+  -- vim.opt.listchars = { eol = '¬', tab = '>·', trail = '~', extends = '>', precedes = '<', space = '␣' }
+  vim.opt.listchars = { eol = '↵', tab = '⇤–⇥', trail = '·', extends = '⇢', precedes = '⇠', space = '·' }
+  vim.cmd("set list!")
+  -- vim.opt.list = not vim.opt.list
+end
+vim.keymap.set('n', '<leader>vl', toggle_listchars, { desc = 'Toggle [v]im [l]istchars' })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
