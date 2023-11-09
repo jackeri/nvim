@@ -226,7 +226,9 @@ require('lazy').setup({
     dependencies = {
       'tpope/vim-repeat'
     }
-  }
+  },
+
+  { 'cofyc/vim-uncrustify' }
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
   --       Uncomment any of the lines below to enable them.
@@ -633,6 +635,27 @@ local function toggle_listchars()
   -- vim.opt.list = not vim.opt.list
 end
 vim.keymap.set('n', '<leader>vl', toggle_listchars, { desc = 'Toggle [v]im [l]istchars' })
+
+-- Uncrustify config
+-- TODO: replace with lua setup at some point
+local function setup_uncrustify_config()
+  local cwd = vim.fn.getcwd()
+  local cfg = cwd .. '/uncrustify.cfg'
+  -- vim.fn.expand('%:h')
+  -- vim.api.nvim_buf_get_name(0)
+  -- vim.fn.system { 'git', 'rev-parse', '--show-toplevel' }
+  if vim.loop.fs_stat(cfg) then
+    print('Setting the uncrustify config to: ' .. cfg)
+    g.uncrustify_cfg_file_path = cfg
+    vim.cmd [[
+      autocmd FileType c noremap <buffer> <c-f> :call Uncrustify('c')<CR>
+      autocmd FileType c vnoremap <buffer> <c-f> :call RangeUncrustify('c')<CR>
+      autocmd FileType cpp noremap <buffer> <c-f> :call Uncrustify('cpp')<CR>
+      autocmd FileType cpp vnoremap <buffer> <c-f> :call RangeUncrustify('cpp')<CR>
+    ]]
+  end
+end
+setup_uncrustify_config()
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
