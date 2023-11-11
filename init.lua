@@ -228,7 +228,9 @@ require('lazy').setup({
     }
   },
 
-  { 'cofyc/vim-uncrustify' }
+  { 'cofyc/vim-uncrustify' },
+
+  { 'norcalli/nvim-colorizer.lua' }
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
   --       Uncomment any of the lines below to enable them.
@@ -243,7 +245,6 @@ require('lazy').setup({
   --    For additional information see: https://github.com/folke/lazy.nvim#-structuring-your-plugins
   -- { import = 'custom.plugins' },
 }, {})
-
 -- [[ Setting options ]]
 -- See `:help vim.o`
 -- NOTE: You can change these options as you wish!
@@ -657,6 +658,11 @@ local function setup_uncrustify_config()
   end
 end
 setup_uncrustify_config()
+
+-- Enable colorizer for all files and enable the rbg and hex parsing
+require('colorizer').setup({
+  '*';
+}, { rgb_fn = true, RRGGBBAA = true })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
