@@ -197,7 +197,7 @@ require('lazy').setup({
       {
         'nvim-telescope/telescope-fzf-native.nvim',
         build =
-          'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build'
+        'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build'
       },
     },
   },
@@ -217,6 +217,13 @@ require('lazy').setup({
       -- add any options here
     },
     lazy = false,
+  },
+
+  {
+    'rcarriga/nvim-dap-ui',
+    dependencies = {
+      'mfussenegger/nvim-dap'
+    }
   },
 
   { 'mg979/vim-visual-multi' },
@@ -306,6 +313,27 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   group = highlight_group,
   pattern = '*',
 })
+
+-- [[ Configure DAP ]]
+local dap, dapui = require("dap"), require("dapui")
+dap.listeners.after.event_initialized["dapui_config"] = function()
+  dapui.open()
+end
+dap.listeners.before.event_terminated["dapui_config"] = function()
+  dapui.close()
+end
+dap.listeners.before.event_exited["dapui_config"] = function()
+  dapui.close()
+end
+
+vim.fn.sign_define('DapBreakpoint', { text = '🟥', texthl = '', linehl = '', numhl = '' })
+vim.fn.sign_define('DapStopped', { text = '▶️', texthl = '', linehl = '', numhl = '' })
+
+vim.keymap.set('n', '<F8>', require 'dap'.continue, { desc = 'Dap continue' })
+vim.keymap.set('n', '<F6>', require 'dap'.step_over, { desc = 'Dap step over' })
+vim.keymap.set('n', '<F5>', require 'dap'.step_into, { desc = 'Dap step into' })
+vim.keymap.set('n', '<F7>', require 'dap'.step_out, { desc = 'Dap step out' })
+vim.keymap.set('n', '<leader>b', require 'dap'.toggle_breakpoint, { desc = 'Toggle [b]reakpoint' })
 
 -- [[ Configure Telescope ]]
 -- See `:help telescope` and `:help telescope.setup()`
@@ -599,12 +627,12 @@ local g = vim.g
 local wo = vim.wo
 local bo = vim.bo
 
-local TAB_WIDTH = 4 -- I like 4 chars as a tab, setup as you wish
+local TAB_WIDTH = 4      -- I like 4 chars as a tab, setup as you wish
 wo.relativenumber = true -- relative line numbers
-wo.scrolloff = 10 -- scrolling offset from top/bottom
-wo.cursorline = true -- hightlight the current cursor line
+wo.scrolloff = 10        -- scrolling offset from top/bottom
+wo.cursorline = true     -- hightlight the current cursor line
 bo.tabstop = TAB_WIDTH
-bo.expandtab = false -- use the normal tab character and not the expanded tab aka spaces
+bo.expandtab = false     -- use the normal tab character and not the expanded tab aka spaces
 bo.shiftwidth = TAB_WIDTH
 
 -- Restore cursor position
@@ -661,7 +689,7 @@ setup_uncrustify_config()
 
 -- Enable colorizer for all files and enable the rbg and hex parsing
 require('colorizer').setup({
-  '*';
+  '*',
 }, { rgb_fn = true, RRGGBBAA = true })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
