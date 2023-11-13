@@ -682,6 +682,8 @@ local function setup_uncrustify_config()
       autocmd FileType c vnoremap <buffer> <c-f> :call RangeUncrustify('c')<CR>
       autocmd FileType cpp noremap <buffer> <c-f> :call Uncrustify('cpp')<CR>
       autocmd FileType cpp vnoremap <buffer> <c-f> :call RangeUncrustify('cpp')<CR>
+      autocmd FileType glsl noremap <buffer> <c-f> :call Uncrustify('glsl')<CR>
+      autocmd FileType glsl vnoremap <buffer> <c-f> :call RangeUncrustify('glsl')<CR>
     ]]
   end
 end
