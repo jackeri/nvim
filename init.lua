@@ -243,6 +243,12 @@ require('lazy').setup({
     'folke/todo-comments.nvim',
     dependencies = { 'nvim-lua/plenary.nvim' },
     opts = {}
+  },
+
+  {
+    'ThePrimeagen/harpoon',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    opts = {}
   }
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
@@ -711,6 +717,10 @@ end, { desc = '[P]revious todo [c]omment' })
 vim.keymap.set('n', '<leader>st', function()
   vim.cmd(':TodoTelescope')
 end, { desc = '[S]earch [T]odos' })
+
+vim.keymap.set('n', '*', '*zz', {desc = 'Search and center screen'})
+vim.keymap.set('n', '<C-d>', '<C-d>zz', {desc = 'Move up and center screen'})
+vim.keymap.set('n', '<C-u>', '<C-u>zz', {desc = 'Mode down and center screen'})
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
