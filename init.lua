@@ -237,7 +237,13 @@ require('lazy').setup({
 
   { 'cofyc/vim-uncrustify' },
 
-  { 'norcalli/nvim-colorizer.lua' }
+  { 'norcalli/nvim-colorizer.lua' },
+
+  {
+    'folke/todo-comments.nvim',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    opts = {}
+  }
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
   --       Uncomment any of the lines below to enable them.
@@ -693,6 +699,18 @@ setup_uncrustify_config()
 require('colorizer').setup({
   '*',
 }, { rgb_fn = true, RRGGBBAA = true })
+
+vim.keymap.set('n', '<leader>cn', function()
+  require('todo-comments').jump_next()
+end, { desc = '[N]ext todo [c]omment' })
+
+vim.keymap.set('n', '<leader>cp', function()
+  require('todo-comments').jump_prev()
+end, { desc = '[P]revious todo [c]omment' })
+
+vim.keymap.set('n', '<leader>st', function()
+  vim.cmd(':TodoTelescope')
+end, { desc = '[S]earch [T]odos' })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
