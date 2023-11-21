@@ -170,6 +170,14 @@ require('lazy').setup({
         component_separators = '|',
         section_separators = '',
       },
+      sections = {
+        lualine_c = {
+          'filename',
+          function()
+            return require('nvim-treesitter').statusline()
+          end
+        }
+      },
     },
   },
 
