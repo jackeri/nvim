@@ -718,12 +718,32 @@ vim.keymap.set('n', '<leader>st', function()
   vim.cmd(':TodoTelescope')
 end, { desc = '[S]earch [T]odos' })
 
-vim.keymap.set('n', '*', '*zz', {desc = 'Search and center screen'})
-vim.keymap.set('n', '<C-d>', '<C-d>zz', {desc = 'Move up and center screen'})
-vim.keymap.set('n', '<C-u>', '<C-u>zz', {desc = 'Mode down and center screen'})
+vim.keymap.set('n', '*', '*zz', { desc = 'Search and center screen' })
+vim.keymap.set('n', '<C-d>', '<C-d>zz', { desc = 'Move up and center screen' })
+vim.keymap.set('n', '<C-u>', '<C-u>zz', { desc = 'Mode down and center screen' })
 
 -- Use groovy as the default Jenkinsfile syntax
-vim.cmd('autocmd BufNewFile,BufRead Jenkinsfile set syntax=groovy')
+-- vim.cmd('autocmd BufNewFile,BufRead Jenkinsfile set syntax=groovy')
+vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufRead' }, {
+  pattern = { 'Jenkinsfile' },
+  callback = function(_)
+    print('Jenkinsfile detected')
+    vim.o.syntax = 'groovy'
+  end,
+  -- command = 'set syntax=groovy'
+})
+
+-- vim.cmd [[
+--   inoremap { {}<Esc>ha
+--   inoremap ( ()<Esc>ha
+--   inoremap [ []<Esc>ha
+--   inoremap " ""<Esc>ha
+--   inoremap ' ''<Esc>ha
+--   inoremap ` ``<Esc>ha
+-- ]]
+
+-- Escape terminal mode with Contro-space
+vim.keymap.set('t', '<C-space>', '<C-\\><C-n>', { silent = true })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
