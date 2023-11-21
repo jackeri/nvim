@@ -722,5 +722,8 @@ vim.keymap.set('n', '*', '*zz', {desc = 'Search and center screen'})
 vim.keymap.set('n', '<C-d>', '<C-d>zz', {desc = 'Move up and center screen'})
 vim.keymap.set('n', '<C-u>', '<C-u>zz', {desc = 'Mode down and center screen'})
 
+-- Use groovy as the default Jenkinsfile syntax
+vim.cmd('autocmd BufNewFile,BufRead Jenkinsfile set syntax=groovy')
+
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
