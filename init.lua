@@ -518,6 +518,7 @@ require('which-key').register {
   ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
   ['<leader>g'] = { name = '[G]it', _ = 'which_key_ignore' },
   -- ['<leader>h'] = { name = 'More git', _ = 'which_key_ignore' },
+  ['<leader>h'] = { name = 'Harpoon', _ = 'which_key_ignore' },
   ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
   ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
   ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
@@ -756,16 +757,17 @@ vim.keymap.set('t', '<C-space>', '<C-\\><C-n>', { silent = true })
 
 require('telescope').load_extension('harpoon')
 
-vim.keymap.set('n', '<leader>hd', require("harpoon.ui").toggle_quick_menu, { desc = 'Toggle Harpoon menu' })
-vim.keymap.set('n', '<leader>ht', '<cmd>Telescope harpoon marks<cr>', { desc = 'Toggle Harpoon menu' })
-vim.keymap.set('n', '<leader>ha', require("harpoon.mark").add_file, { desc = 'Toggle Harpoon menu' })
+vim.keymap.set('n', '<leader>hd', require("harpoon.ui").toggle_quick_menu, { desc = 'Toggle [H]arpoon menu' })
+vim.keymap.set('n', '<leader>ht', '<cmd>Telescope harpoon marks<cr>', { desc = 'Show [h]arpoon [t]elecope menu' })
+vim.keymap.set('n', '<leader>ha', require("harpoon.mark").add_file, { desc = '[A]dd file to [h]arpoon' })
+vim.keymap.set('n', '<leader>hr', require("harpoon.mark").rm_file, { desc = '[R]emove file from [h]arpoon' })
 vim.keymap.set('n', '<leader>h', function()
   local c = vim.fn.getchar() - 48
   if c < 0 or c > 10 then
     return
   end
   require("harpoon.ui").nav_file(c)
-end)
+end, { desc = 'Jump to [h]arpoon file' })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
