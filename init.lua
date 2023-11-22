@@ -124,7 +124,8 @@ require('lazy').setup({
         changedelete = { text = '~' },
       },
       on_attach = function(bufnr)
-        vim.keymap.set('n', '<leader>hp', require('gitsigns').preview_hunk, { buffer = bufnr, desc = 'Preview git hunk' })
+        vim.keymap.set('n', '<leader>gp', require('gitsigns').preview_hunk,
+          { buffer = bufnr, desc = 'Preview git hunk' })
 
         -- don't override the built-in and fugitive keymaps
         local gs = package.loaded.gitsigns
@@ -516,7 +517,7 @@ require('which-key').register {
   ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
   ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
   ['<leader>g'] = { name = '[G]it', _ = 'which_key_ignore' },
-  ['<leader>h'] = { name = 'More git', _ = 'which_key_ignore' },
+  -- ['<leader>h'] = { name = 'More git', _ = 'which_key_ignore' },
   ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
   ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
   ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
@@ -752,6 +753,19 @@ vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufRead' }, {
 
 -- Escape terminal mode with Contro-space
 vim.keymap.set('t', '<C-space>', '<C-\\><C-n>', { silent = true })
+
+require('telescope').load_extension('harpoon')
+
+vim.keymap.set('n', '<leader>hd', require("harpoon.ui").toggle_quick_menu, { desc = 'Toggle Harpoon menu' })
+vim.keymap.set('n', '<leader>ht', '<cmd>Telescope harpoon marks<cr>', { desc = 'Toggle Harpoon menu' })
+vim.keymap.set('n', '<leader>ha', require("harpoon.mark").add_file, { desc = 'Toggle Harpoon menu' })
+vim.keymap.set('n', '<leader>h', function()
+  local c = vim.fn.getchar() - 48
+  if c < 0 or c > 10 then
+    return
+  end
+  require("harpoon.ui").nav_file(c)
+end)
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
