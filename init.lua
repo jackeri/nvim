@@ -761,6 +761,24 @@ vim.keymap.set('n', '<leader>hd', require("harpoon.ui").toggle_quick_menu, { des
 vim.keymap.set('n', '<leader>ht', '<cmd>Telescope harpoon marks<cr>', { desc = 'Show [h]arpoon [t]elecope menu' })
 vim.keymap.set('n', '<leader>ha', require("harpoon.mark").add_file, { desc = '[A]dd file to [h]arpoon' })
 vim.keymap.set('n', '<leader>hr', require("harpoon.mark").rm_file, { desc = '[R]emove file from [h]arpoon' })
+
+-- Bind Tab and Backspace into the harpoon next/previous
+-- vim.keymap.set('n', '<Tab>', require("harpoon.ui").nav_next, { desc = '[H]arpoon next' })
+-- vim.keymap.set('n', '<BS>', require("harpoon.ui").nav_prev, { desc = '[H]arpoon previous' })
+-- Instead of overwriting the default bindings, instead check if there are marks and just use default actions there are none
+vim.keymap.set('n', '<Tab>', function()
+  if require("harpoon.mark").get_length() == 0 then
+    return '<Tab>'
+  end
+  return '<cmd>lua require("harpoon.ui").nav_next()<cr>'
+end, { expr = true, replace_keycodes = true, desc = '[H]arpoon next' })
+vim.keymap.set('n', '<BS>', function()
+  if require("harpoon.mark").get_length() == 0 then
+    print('Returning backspace')
+    return '<BS>'
+  end
+  return '<cmd>lua require("harpoon.ui").nav_prev()<cr>'
+end, { expr = true, replace_keycodes = true, desc = '[H]arpoon previous' })
 vim.keymap.set('n', '<leader>h', function()
   local c = vim.fn.getchar() - 48
   if c < 0 or c > 10 then
@@ -768,6 +786,15 @@ vim.keymap.set('n', '<leader>h', function()
   end
   require("harpoon.ui").nav_file(c)
 end, { desc = 'Jump to [h]arpoon file' })
+
+vim.api.nvim_create_user_command('ToTabs', function(_)
+  vim.cmd [[
+    set ts=4
+    set noet
+    %retab!
+    %s/\s\+$//e
+  ]]
+end, { desc = 'Change current buffers indentation to tabs (expects 4 spaces)' })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
