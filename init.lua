@@ -555,7 +555,8 @@ local servers = {
     },
   },
 
-  volar = { filetypes = { 'vue' } }
+  volar = { filetypes = { 'vue' } },
+  lemminx = { filetypes = { 'xml' } }
 }
 
 -- Setup neovim lua configuration
