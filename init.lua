@@ -542,7 +542,7 @@ require('mason-lspconfig').setup()
 --  define the property 'filetypes' to the map in question.
 local servers = {
   clangd = {},
-  -- gopls = {},
+  gopls = {},
   -- pyright = {},
   rust_analyzer = {},
   tsserver = {},
@@ -654,8 +654,8 @@ local TAB_WIDTH = 4      -- I like 4 chars as a tab, setup as you wish
 wo.relativenumber = true -- relative line numbers
 wo.scrolloff = 10        -- scrolling offset from top/bottom
 wo.cursorline = true     -- hightlight the current cursor line
-bo.tabstop = TAB_WIDTH
 bo.expandtab = false     -- use the normal tab character and not the expanded tab aka spaces
+bo.tabstop = TAB_WIDTH
 bo.shiftwidth = TAB_WIDTH
 
 -- Restore cursor position
