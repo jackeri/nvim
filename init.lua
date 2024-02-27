@@ -842,5 +842,19 @@ vim.opt.wrap = true
 vim.opt.wrapmargin = 8
 vim.opt.linebreak = true
 
+require("lspconfig").ltex.setup {
+  on_attach = on_attach,
+  filetypes = { "markdown", "text", "tex", "bib" },
+  settings = {
+    ltex = {
+      languageToolHttpServerUri = 'https://api.languagetoolplus.com',
+      languageToolOrg = {
+        username = os.getenv("LATOOL_EMAIL"),
+        apiKey = os.getenv("LATOOL_TOKEN"),
+      }
+    }
+  }
+}
+
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
