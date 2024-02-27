@@ -264,7 +264,10 @@ require('lazy').setup({
   {
     'nvim-tree/nvim-tree.lua',
     dependencies = { 'nvim-tree/nvim-web-devicons' }
-  }
+  },
+
+  -- LaTex
+  { 'lervag/vimtex' }
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
   --       Uncomment any of the lines below to enable them.
@@ -295,6 +298,12 @@ vim.o.mouse = 'a'
 -- Sync clipboard between OS and Neovim.
 --  Remove this option if you want your OS clipboard to remain independent.
 --  See `:help 'clipboard'`
+
+-- if vim.loop.os_uname().sysname == "Linux" then
+--   vim.o.clipboard = 'unnamed'
+-- else
+--   vim.o.clipboard = 'unnamedplus'
+-- end
 vim.o.clipboard = 'unnamedplus'
 
 -- Enable break indent
@@ -563,7 +572,8 @@ local servers = {
 
   volar = { filetypes = { 'vue' } },
   lemminx = { filetypes = { 'xml' } },
-  intelephense = {}
+  intelephense = {},
+  zls = {}
 }
 
 -- Setup neovim lua configuration
@@ -832,6 +842,10 @@ local function handle_nvim_tree()
   tree.tree.close()
 end
 vim.api.nvim_create_autocmd({ "VimEnter" }, { callback = handle_nvim_tree })
+
+vim.opt.wrap = true
+vim.opt.wrapmargin = 8
+vim.opt.linebreak = true
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
