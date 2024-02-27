@@ -299,11 +299,6 @@ vim.o.mouse = 'a'
 --  Remove this option if you want your OS clipboard to remain independent.
 --  See `:help 'clipboard'`
 
--- if vim.loop.os_uname().sysname == "Linux" then
---   vim.o.clipboard = 'unnamed'
--- else
---   vim.o.clipboard = 'unnamedplus'
--- end
 vim.o.clipboard = 'unnamedplus'
 
 -- Enable break indent
