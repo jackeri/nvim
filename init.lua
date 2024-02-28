@@ -267,7 +267,8 @@ require('lazy').setup({
   },
 
   -- LaTex
-  { 'lervag/vimtex' }
+  { 'lervag/vimtex' },
+  { 'smithbm2316/centerpad.nvim' }
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
   --       Uncomment any of the lines below to enable them.
@@ -838,8 +839,10 @@ local function handle_nvim_tree()
 end
 vim.api.nvim_create_autocmd({ "VimEnter" }, { callback = handle_nvim_tree })
 
+-- Only use soft-wrapping
 vim.opt.wrap = true
-vim.opt.wrapmargin = 8
+vim.opt.wrapmargin = 0
+vim.opt.textwidth = 0
 vim.opt.linebreak = true
 
 require("lspconfig").ltex.setup {
@@ -855,6 +858,11 @@ require("lspconfig").ltex.setup {
     }
   }
 }
+
+vim.keymap.set('n', '<leader>tc', function ()
+  require("centerpad").toggle({ leftpad = 30, rightpad = 30 })
+end, { silent = true, noremap = true, desc = '[T]oggle [C]enterpad' })
+-- vim.keymap.set('n', '<leader>tc', '<cmd>Centerpad<cr>', { silent = true, noremap = true, desc = '[T]oggle [C]enterpad' })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
