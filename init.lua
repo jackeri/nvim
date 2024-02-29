@@ -268,7 +268,8 @@ require('lazy').setup({
 
   -- LaTex
   { 'lervag/vimtex' },
-  { 'smithbm2316/centerpad.nvim' }
+  { 'smithbm2316/centerpad.nvim' },
+  { 'fedepujol/move.nvim' }
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
   --       Uncomment any of the lines below to enable them.
@@ -659,17 +660,19 @@ end
 vim.keymap.set('n', '<leader>vrc', reload_vim_config, { desc = '[V]im [R]reload [C]onfig' })
 
 -- enable relative line nubmers and center the cursor location
-local g = vim.g
-local wo = vim.wo
-local bo = vim.bo
+local g = vim.g          -- global options
+local wo = vim.wo        -- window options
+local bo = vim.bo        -- buffer options
+local set = vim.opt      -- set options
 
 local TAB_WIDTH = 4      -- I like 4 chars as a tab, setup as you wish
 wo.relativenumber = true -- relative line numbers
 wo.scrolloff = 10        -- scrolling offset from top/bottom
 wo.cursorline = true     -- hightlight the current cursor line
-bo.expandtab = false     -- use the normal tab character and not the expanded tab aka spaces
-bo.tabstop = TAB_WIDTH
-bo.shiftwidth = TAB_WIDTH
+set.expandtab = false -- use the normal tab character and not the expanded tab aka spaces
+set.tabstop = TAB_WIDTH
+set.softtabstop = TAB_WIDTH
+set.shiftwidth = TAB_WIDTH
 
 -- Restore cursor position
 vim.api.nvim_create_autocmd({ "BufReadPost" }, {
@@ -859,10 +862,45 @@ require("lspconfig").ltex.setup {
   }
 }
 
-vim.keymap.set('n', '<leader>tc', function ()
+vim.keymap.set('n', '<leader>tc', function()
   require("centerpad").toggle({ leftpad = 30, rightpad = 30 })
 end, { silent = true, noremap = true, desc = '[T]oggle [C]enterpad' })
 -- vim.keymap.set('n', '<leader>tc', '<cmd>Centerpad<cr>', { silent = true, noremap = true, desc = '[T]oggle [C]enterpad' })
+
+-- local opts = { noremap = true, silent = true }
+-- vim.keymap.set('n', '<S-j>', ':m .+1<CR>==', opts)
+-- vim.keymap.set('n', '<S-k>', ':m .-2<CR>==', opts)
+
+require('move').setup({
+	line = {
+		enable = true, -- Enables line movement
+		indent = true  -- Toggles indentation
+	},
+	block = {
+		enable = true, -- Enables block movement
+		indent = true  -- Toggles indentation
+	},
+	word = {
+		enable = true, -- Enables word movement
+	},
+	char = {
+		enable = false -- Enables char movement
+	}
+})
+local opts = { noremap = true, silent = true }
+-- Normal-mode commands
+vim.keymap.set('n', '<S-Down>', ':MoveLine(1)<CR>', opts)
+vim.keymap.set('n', '<S-Up>', ':MoveLine(-1)<CR>', opts)
+vim.keymap.set('n', '<S-Left>', ':MoveHChar(-1)<CR>', opts)
+vim.keymap.set('n', '<S-Right>', ':MoveHChar(1)<CR>', opts)
+vim.keymap.set('n', '<leader>wf', ':MoveWord(1)<CR>', opts)
+vim.keymap.set('n', '<leader>wb', ':MoveWord(-1)<CR>', opts)
+
+-- Visual-mode commands
+vim.keymap.set('v', '<S-Down>', ':MoveBlock(1)<CR>', opts)
+vim.keymap.set('v', '<S-Up>', ':MoveBlock(-1)<CR>', opts)
+vim.keymap.set('v', '<S-Left>', ':MoveHBlock(-1)<CR>', opts)
+vim.keymap.set('v', '<S-Right>', ':MoveHBlock(1)<CR>', opts)
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
