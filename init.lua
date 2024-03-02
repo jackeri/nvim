@@ -171,13 +171,27 @@ require('lazy').setup({
         component_separators = '|',
         section_separators = '',
       },
+      tabline = {
+        lualine_a = {},
+        lualine_b = {
+          {
+            "filename",
+            path = 2
+          }
+        },
+        lualine_c = {},
+        lualine_x = {},
+        lualine_y = {},
+        lualine_z = {}
+      },
       sections = {
         lualine_c = {
           'filename',
           function()
             return require('nvim-treesitter').statusline()
           end
-        }
+        },
+        lualine_x = { 'datetime', 'encoding', 'fileformat', 'filetype' }
       },
     },
   },
@@ -267,9 +281,45 @@ require('lazy').setup({
   },
 
   -- LaTex
-  { 'lervag/vimtex' },
+  {
+    'lervag/vimtex',
+    init = function()
+      if vim.fn.has('macunix') == 1 then
+        vim.g.vimtex_compiler_latexmk = {
+          options = {
+            '-xelatex',
+            '-file-line-error',
+            '-synctex=1',
+            '-interaction=nonstopmode',
+            '-shell-escape',
+          },
+        }
+        vim.g.vimtex_view_method = 'skim'
+        vim.g.vimtex_view_skim_sync = 1
+        vim.g.vimtex_view_skim_activate = 1
+      end
+    end
+  },
   { 'smithbm2316/centerpad.nvim' },
-  { 'fedepujol/move.nvim' }
+  { 'fedepujol/move.nvim' },
+
+  -- Copilot setup
+  { 'github/copilot.vim' },
+
+  -- ChatGPT
+  {
+    'jackMort/ChatGPT.nvim',
+    event = "VeryLazy",
+    config = function()
+      require('chatgpt').setup()
+    end,
+    dependencies = {
+      'MunifTanjim/nui.nvim',
+      'nvim-lua/plenary.nvim',
+      'folke/trouble.nvim',
+      'nvim-telescope/telescope.nvim'
+    }
+  }
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
   --       Uncomment any of the lines below to enable them.
@@ -541,7 +591,15 @@ require('which-key').register {
 
 -- mason-lspconfig requires that these setup functions are called in this order
 -- before setting up the servers.
-require('mason').setup()
+require('mason').setup({
+  ui = {
+    icons = {
+      package_installed = "✓",
+      package_pending = "➜",
+      package_uninstalled = "✗"
+    }
+  }
+})
 require('mason-lspconfig').setup()
 
 -- Enable the following language servers
@@ -669,7 +727,7 @@ local TAB_WIDTH = 4      -- I like 4 chars as a tab, setup as you wish
 wo.relativenumber = true -- relative line numbers
 wo.scrolloff = 10        -- scrolling offset from top/bottom
 wo.cursorline = true     -- hightlight the current cursor line
-set.expandtab = false -- use the normal tab character and not the expanded tab aka spaces
+set.expandtab = false    -- use the normal tab character and not the expanded tab aka spaces
 set.tabstop = TAB_WIDTH
 set.softtabstop = TAB_WIDTH
 set.shiftwidth = TAB_WIDTH
@@ -872,20 +930,20 @@ end, { silent = true, noremap = true, desc = '[T]oggle [C]enterpad' })
 -- vim.keymap.set('n', '<S-k>', ':m .-2<CR>==', opts)
 
 require('move').setup({
-	line = {
-		enable = true, -- Enables line movement
-		indent = true  -- Toggles indentation
-	},
-	block = {
-		enable = true, -- Enables block movement
-		indent = true  -- Toggles indentation
-	},
-	word = {
-		enable = true, -- Enables word movement
-	},
-	char = {
-		enable = false -- Enables char movement
-	}
+  line = {
+    enable = true, -- Enables line movement
+    indent = true  -- Toggles indentation
+  },
+  block = {
+    enable = true, -- Enables block movement
+    indent = true  -- Toggles indentation
+  },
+  word = {
+    enable = true, -- Enables word movement
+  },
+  char = {
+    enable = false -- Enables char movement
+  }
 })
 local opts = { noremap = true, silent = true }
 -- Normal-mode commands
