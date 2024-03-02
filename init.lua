@@ -726,8 +726,8 @@ local set = vim.opt      -- set options
 
 local TAB_WIDTH = 4      -- I like 4 chars as a tab, setup as you wish
 wo.relativenumber = true -- relative line numbers
-wo.scrolloff = 10        -- scrolling offset from top/bottom
-wo.cursorline = true     -- hightlight the current cursor line
+set.scrolloff = 10        -- scrolling offset from top/bottom
+set.cursorline = true     -- hightlight the current cursor line
 set.expandtab = false    -- use the normal tab character and not the expanded tab aka spaces
 set.tabstop = TAB_WIDTH
 set.softtabstop = TAB_WIDTH
