@@ -258,7 +258,7 @@ require('lazy').setup({
     }
   },
 
-  { 'cofyc/vim-uncrustify' },
+  -- { 'cofyc/vim-uncrustify' },
 
   { 'norcalli/nvim-colorizer.lua' },
 
@@ -768,26 +768,26 @@ vim.keymap.set('n', '<leader>vl', toggle_listchars, { desc = 'Toggle [v]im [l]is
 
 -- Uncrustify config
 -- TODO: replace with lua setup at some point
-local function setup_uncrustify_config()
-  local cwd = vim.fn.getcwd()
-  local cfg = cwd .. '/uncrustify.cfg'
-  -- vim.fn.expand('%:h')
-  -- vim.api.nvim_buf_get_name(0)
-  -- vim.fn.system { 'git', 'rev-parse', '--show-toplevel' }
-  if vim.loop.fs_stat(cfg) then
-    print('Setting the uncrustify config to: ' .. cfg)
-    g.uncrustify_cfg_file_path = cfg
-    vim.cmd [[
-      autocmd FileType c noremap <buffer> <c-f> :call Uncrustify('c')<CR>
-      autocmd FileType c vnoremap <buffer> <c-f> :call RangeUncrustify('c')<CR>
-      autocmd FileType cpp noremap <buffer> <c-f> :call Uncrustify('cpp')<CR>
-      autocmd FileType cpp vnoremap <buffer> <c-f> :call RangeUncrustify('cpp')<CR>
-      autocmd FileType glsl noremap <buffer> <c-f> :call Uncrustify('glsl')<CR>
-      autocmd FileType glsl vnoremap <buffer> <c-f> :call RangeUncrustify('glsl')<CR>
-    ]]
-  end
-end
-setup_uncrustify_config()
+-- local function setup_uncrustify_config()
+--   local cwd = vim.fn.getcwd()
+--   local cfg = cwd .. '/uncrustify.cfg'
+--   -- vim.fn.expand('%:h')
+--   -- vim.api.nvim_buf_get_name(0)
+--   -- vim.fn.system { 'git', 'rev-parse', '--show-toplevel' }
+--   if vim.loop.fs_stat(cfg) then
+--     print('Setting the uncrustify config to: ' .. cfg)
+--     g.uncrustify_cfg_file_path = cfg
+--     vim.cmd [[
+--       autocmd FileType c noremap <buffer> <c-f> :call Uncrustify('c')<CR>
+--       autocmd FileType c vnoremap <buffer> <c-f> :call RangeUncrustify('c')<CR>
+--       autocmd FileType cpp noremap <buffer> <c-f> :call Uncrustify('cpp')<CR>
+--       autocmd FileType cpp vnoremap <buffer> <c-f> :call RangeUncrustify('cpp')<CR>
+--       autocmd FileType glsl noremap <buffer> <c-f> :call Uncrustify('glsl')<CR>
+--       autocmd FileType glsl vnoremap <buffer> <c-f> :call RangeUncrustify('glsl')<CR>
+--     ]]
+--   end
+-- end
+-- setup_uncrustify_config()
 
 -- Enable colorizer for all files and enable the rbg and hex parsing
 require('colorizer').setup({
