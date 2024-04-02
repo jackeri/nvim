@@ -362,6 +362,15 @@ require('lazy').setup({
     },
     enabled = false,
   },
+
+  -- Hightlight whitespace text
+  {
+    'ntpeters/vim-better-whitespace',
+    setup = function()
+      vim.g.better_whitespace_enabled = 1
+      vim.g.strip_whitespace_on_save = 0
+    end,
+  },
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
   --       Uncomment any of the lines below to enable them.
