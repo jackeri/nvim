@@ -234,11 +234,11 @@ require('lazy').setup({
               ['<C-d>'] = false,
             },
           },
-          file_ignore_patterns = { 'node_modules', '.git', 'dist', 'build', 'target', 'vendor' },
-          extensions = {
-            ['ui-select'] = {
-              require('telescope.themes').get_dropdown(),
-            },
+        },
+        file_ignore_patterns = { 'node_modules', '.git', 'dist', 'build', 'target', 'vendor' },
+        extensions = {
+          ['ui-select'] = {
+            require('telescope.themes').get_dropdown(),
           },
         },
       }
@@ -263,6 +263,20 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
+
+      -- It's also possible to pass additional configuration options.
+      --  See `:help telescope.builtin.live_grep()` for information about particular keys
+      vim.keymap.set('n', '<leader>s/', function()
+        builtin.live_grep {
+          grep_open_files = true,
+          prompt_title = 'Live Grep in Open Files',
+        }
+      end, { desc = '[S]earch [/] in Open Files' })
+
+      -- Shortcut for searching your Neovim configuration files
+      vim.keymap.set('n', '<leader>sn', function()
+        builtin.find_files { cwd = vim.fn.stdpath 'config' }
+      end, { desc = '[S]earch [N]eovim files' })
     end,
   },
 
