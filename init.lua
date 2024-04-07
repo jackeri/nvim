@@ -871,7 +871,7 @@ vim.keymap.set('n', '<leader>hd', function()
   harpoon.ui:toggle_quick_menu(harpoon:list())
 end, { desc = 'Toggle [H]arpoon menu' })
 vim.keymap.set('n', '<leader>ha', function()
-  harpoon:list():append()
+  harpoon:list():add()
 end, { desc = '[A]dd file to [h]arpoon' })
 vim.keymap.set('n', '<Tab>', function()
   harpoon:list():next { ui_nav_wrap = true }
