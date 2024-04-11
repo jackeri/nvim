@@ -873,6 +873,9 @@ end, { desc = 'Toggle [H]arpoon menu' })
 vim.keymap.set('n', '<leader>ha', function()
   harpoon:list():add()
 end, { desc = '[A]dd file to [h]arpoon' })
+vim.keymap.set('n', '<leader>hr', function()
+  harpoon:list():remove()
+end, { desc = '[R]emove file from [h]arpoon' })
 vim.keymap.set('n', '<Tab>', function()
   harpoon:list():next { ui_nav_wrap = true }
 end, { desc = '[H]arpoon next' })
@@ -984,6 +987,8 @@ vim.keymap.set('v', '<S-Down>', ':MoveBlock(1)<CR>', opts)
 vim.keymap.set('v', '<S-Up>', ':MoveBlock(-1)<CR>', opts)
 vim.keymap.set('v', '<S-Left>', ':MoveHBlock(-1)<CR>', opts)
 vim.keymap.set('v', '<S-Right>', ':MoveHBlock(1)<CR>', opts)
+
+vim.keymap.set('n', '<leader><BS>', ':bd<CR>', { desc = 'Close buffer' })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
