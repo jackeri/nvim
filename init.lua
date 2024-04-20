@@ -42,6 +42,7 @@ P.S. You can delete this when you're done too. It's your config now :)
 --  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
+vim.g.have_nerd_font = true
 
 -- Install package manager
 --    https://github.com/folke/lazy.nvim
@@ -626,6 +627,7 @@ require('which-key').register {
   ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
   ['<leader>v'] = { name = '[V]im', _ = 'which_key_ignore' },
   ['<leader>vr'] = { name = '[V]im [R]reload', _ = 'which_key_ignore' },
+  ['<leader>u'] = { name = '[U]ndo tree', _ = 'which_key_ignore' },
   ['C-n'] = { name = 'Multicursor select word', _ = 'which_key_ignore' },
 }
 
