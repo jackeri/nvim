@@ -616,19 +616,19 @@ local on_attach = function(_, bufnr)
 end
 
 -- document existing key chains
-require('which-key').register {
-  ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
-  ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
-  ['<leader>g'] = { name = '[G]it', _ = 'which_key_ignore' },
-  -- ['<leader>h'] = { name = 'More git', _ = 'which_key_ignore' },
-  ['<leader>h'] = { name = 'Harpoon', _ = 'which_key_ignore' },
-  ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
-  ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-  ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
-  ['<leader>v'] = { name = '[V]im', _ = 'which_key_ignore' },
-  ['<leader>vr'] = { name = '[V]im [R]reload', _ = 'which_key_ignore' },
-  ['<leader>u'] = { name = '[U]ndo tree', _ = 'which_key_ignore' },
-  ['C-n'] = { name = 'Multicursor select word', _ = 'which_key_ignore' },
+require('which-key').add {
+  { '<leader>c', group = '[C]ode' },
+  { '<leader>d', group = '[D]ocument' },
+  { '<leader>g', group = '[G]it' },
+  -- {'<leader>h', group = 'More git'},
+  { '<leader>h', group = 'Harpoon' },
+  { '<leader>r', group = '[R]ename' },
+  { '<leader>s', group = '[S]earch' },
+  { '<leader>w', group = '[W]orkspace' },
+  { '<leader>v', group = '[V]im' },
+  { '<leader>vr', group = '[V]im [R]reload' },
+  { '<leader>u', group = '[U]ndo tree' },
+  { 'C-n', group = 'Multicursor select word' },
 }
 
 -- mason-lspconfig requires that these setup functions are called in this order
