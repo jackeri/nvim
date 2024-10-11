@@ -588,10 +588,6 @@ vim.defer_fn(function()
       },
     },
   }
-  vim.wo.foldmethod = 'expr'
-  vim.wo.foldexpr = 'nvim_treesitter#foldexpr()'
-  vim.opt.foldlevelstart = 99
-  vim.opt.foldenable = true
 end, 0)
 
 -- Diagnostic keymaps
@@ -873,6 +869,19 @@ vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufRead' }, {
   end,
   -- command = 'set syntax=groovy'
 })
+
+-- Enable the treesitter folding if supported by the current buffer
+vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufReadPost' }, {
+  callback = function()
+    -- Check if the current buffer has a treesitter highlighter support
+    if vim.treesitter.highlighter.active[vim.api.nvim_get_current_buf()] ~= nil then
+      vim.wo.foldmethod = 'expr'
+      vim.wo.foldexpr = 'nvim_treesitter#foldexpr()'
+    end
+  end,
+})
+vim.opt.foldlevelstart = 99
+vim.opt.foldenable = true
 
 -- vim.cmd [[
 --   inoremap { {}<Esc>ha
