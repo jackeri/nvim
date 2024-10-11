@@ -300,10 +300,48 @@ require('lazy').setup({
 
   {
     'rcarriga/nvim-dap-ui',
+    event = 'VeryLazy',
     dependencies = {
       'mfussenegger/nvim-dap',
       'nvim-neotest/nvim-nio',
     },
+    config = function()
+      -- [[ Configure DAP ]]
+      local dap, dapui = require 'dap', require 'dapui'
+      dapui.setup()
+      dap.listeners.after.event_initialized['dapui_config'] = function()
+        dapui.open()
+      end
+      dap.listeners.before.event_terminated['dapui_config'] = function()
+        dapui.close()
+      end
+      dap.listeners.before.event_exited['dapui_config'] = function()
+        dapui.close()
+      end
+    end,
+  },
+
+  {
+    'jay-babu/mason-nvim-dap.nvim',
+    event = 'VeryLazy',
+    dependencies = {
+      'williamboman/mason.nvim',
+      'mfussenegger/nvim-dap',
+    },
+    opts = {
+      handlers = {},
+    },
+  },
+
+  { 'mfussenegger/nvim-dap' },
+
+  {
+    'Civitasv/cmake-tools.nvim',
+    event = 'VeryLazy',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    config = function()
+      require('cmake-tools').setup {}
+    end,
   },
 
   { 'mg979/vim-visual-multi' },
@@ -474,20 +512,8 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   pattern = '*',
 })
 
--- [[ Configure DAP ]]
-local dap, dapui = require 'dap', require 'dapui'
-dap.listeners.after.event_initialized['dapui_config'] = function()
-  dapui.open()
-end
-dap.listeners.before.event_terminated['dapui_config'] = function()
-  dapui.close()
-end
-dap.listeners.before.event_exited['dapui_config'] = function()
-  dapui.close()
-end
-
-vim.fn.sign_define('DapBreakpoint', { text = '🟥', texthl = '', linehl = '', numhl = '' })
-vim.fn.sign_define('DapStopped', { text = '▶️', texthl = '', linehl = '', numhl = '' })
+-- vim.fn.sign_define('DapBreakpoint', { text = '🟥', texthl = '', linehl = '', numhl = '' })
+-- vim.fn.sign_define('DapStopped', { text = '▶️', texthl = '', linehl = '', numhl = '' })
 
 vim.keymap.set('n', '<F8>', require('dap').continue, { desc = 'Dap continue' })
 vim.keymap.set('n', '<F6>', require('dap').step_over, { desc = 'Dap step over' })
