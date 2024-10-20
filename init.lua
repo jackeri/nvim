@@ -398,7 +398,30 @@ require('lazy').setup({
   { 'fedepujol/move.nvim' },
 
   -- Copilot setup
-  { 'github/copilot.vim' },
+  {
+    'github/copilot.vim',
+    config = function()
+      vim.g.copilot_no_tab_map = true
+      vim.g.copilot_assume_mapped = true
+      vim.g.copilot_filetypes = {
+        ['*'] = false,
+        ['javascript'] = true,
+        ['typescript'] = true,
+        ['lua'] = true,
+        ['rust'] = true,
+        ['c'] = true,
+        ['c#'] = true,
+        ['c++'] = true,
+        ['go'] = true,
+        ['python'] = true,
+      }
+      -- vim.api.nvim_set_keymap('i', '<C-J>', 'copilot#Accept("<CR>")', { expr = true, silent = true })
+      vim.keymap.set('i', '<C-J>', function()
+        -- vim.fn['copilot#Accept'] '<CR>'
+        vim.fn.feedkeys(vim.fn['copilot#Accept'] '<CR>', '')
+      end, { silent = true })
+    end,
+  },
 
   -- ChatGPT
   {
@@ -442,14 +465,14 @@ require('lazy').setup({
   require 'jacker.plugins.lint',
 
   {
-    "kylechui/nvim-surround",
-    version = "*", -- Use for stability; omit to use `main` branch for the latest features
-    event = "VeryLazy",
+    'kylechui/nvim-surround',
+    version = '*', -- Use for stability; omit to use `main` branch for the latest features
+    event = 'VeryLazy',
     config = function()
-      require("nvim-surround").setup({
-      -- Configuration here, or leave empty to use defaults
-      })
-    end
+      require('nvim-surround').setup {
+        -- Configuration here, or leave empty to use defaults
+      }
+    end,
   },
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
@@ -761,15 +784,24 @@ cmp.setup {
     ['<C-d>'] = cmp.mapping.scroll_docs(-4),
     ['<C-f>'] = cmp.mapping.scroll_docs(4),
     ['<C-Space>'] = cmp.mapping.complete {},
-    ['<CR>'] = cmp.mapping.confirm {
-      behavior = cmp.ConfirmBehavior.Replace,
-      select = true,
-    },
+    ['<CR>'] = cmp.mapping(function(fallback)
+      if cmp.visible() and cmp.get_selected_index() ~= nil then
+        cmp.confirm {
+          behavior = cmp.ConfirmBehavior.Replace,
+          select = true,
+        }
+      else
+        fallback()
+      end
+    end, { 'i', 's' }),
     ['<Tab>'] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_next_item()
       elseif luasnip.expand_or_locally_jumpable() then
-        luasnip.expand_or_jump()
+        -- luasnip.expand_or_jump()
+        vim.fn.feedkeys(vim.api.nvim_replace_termcodes('<Plug>luasnip-expand-or-jump', true, true, true), '')
+      elseif vim.b._copilot_suggestion ~= nil then
+        vim.fn.feedkeys(vim.api.nvim_replace_termcodes(vim.fn['copilot#Accept'](), true, true, true), '')
       else
         fallback()
       end
@@ -982,6 +1014,10 @@ require('nvim-tree').setup {
   filters = {
     dotfiles = true,
   },
+  disable_netrw = true,
+  update_focused_file = {
+    enable = true,
+  },
 }
 vim.keymap.set('n', '<c-p>', function()
   local tree = require 'nvim-tree.api'
@@ -994,6 +1030,16 @@ local function handle_nvim_tree()
   tree.tree.close()
 end
 vim.api.nvim_create_autocmd({ 'VimEnter' }, { callback = handle_nvim_tree })
+vim.api.nvim_create_autocmd('BufEnter', {
+  group = vim.api.nvim_create_augroup('NvimTreeClose', { clear = true }),
+  pattern = 'NvimTree_*',
+  callback = function()
+    local layout = vim.api.nvim_call_function('winlayout', {})
+    if layout[1] == 'leaf' and vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(layout[2]), 'filetype') == 'NvimTree' and layout[3] == nil then
+      vim.cmd 'confirm quit'
+    end
+  end,
+})
 
 -- Only use soft-wrapping
 vim.opt.wrap = true
