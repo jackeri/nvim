@@ -719,7 +719,7 @@ local servers = {
   gopls = {},
   -- pyright = {},
   rust_analyzer = {},
-  ts_ls = {},
+  -- ts_ls = {},
   html = { filetypes = { 'html', 'twig', 'hbs' } },
 
   lua_ls = {
@@ -729,7 +729,7 @@ local servers = {
     },
   },
 
-  volar = { filetypes = { 'vue' } },
+  -- volar = { filetypes = { 'vue' } },
   lemminx = { filetypes = { 'xml' } },
   intelephense = {},
   zls = {},
@@ -1060,6 +1060,42 @@ require('lspconfig').ltex.setup {
     },
   },
 }
+
+local mason_registry = require 'mason-registry'
+local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server'
+
+local lspconfig = require 'lspconfig'
+local use_volar_hybridmode = false
+
+if use_volar_hybridmode then
+  lspconfig.ts_ls.setup {
+    on_attach = on_attach,
+
+    init_options = {
+      plugins = {
+        {
+          name = '@vue/typescript-plugin',
+          location = vue_language_server_path,
+          languages = { 'vue' },
+        },
+      },
+    },
+    filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
+  }
+
+  -- No need to set `hybridMode` to `true` as it's the default value
+  lspconfig.volar.setup {}
+else
+  lspconfig.volar.setup {
+    on_attach = on_attach,
+    filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue', 'json' },
+    init_options = {
+      vue = {
+        hybridMode = false,
+      },
+    },
+  }
+end
 
 vim.keymap.set('n', '<leader>tc', function()
   require('centerpad').toggle { leftpad = 30, rightpad = 30 }
