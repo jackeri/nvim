@@ -107,6 +107,7 @@ require('lazy').setup({
 
       -- Adds a number of user-friendly snippets
       'rafamadriz/friendly-snippets',
+      'hrsh7th/cmp-cmdline',
     },
   },
 
@@ -475,6 +476,43 @@ require('lazy').setup({
     end,
   },
 
+  -- Noice cmmandline (experimenta)
+  {
+    'folke/noice.nvim',
+    event = 'VeryLazy',
+    opts = {
+      -- add any options here
+    },
+    config = function()
+      require('noice').setup {
+        lsp = {
+          -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
+          override = {
+            ['vim.lsp.util.convert_input_to_markdown_lines'] = true,
+            ['vim.lsp.util.stylize_markdown'] = true,
+            ['cmp.entry.get_documentation'] = true, -- requires hrsh7th/nvim-cmp
+          },
+        },
+        -- you can enable a preset for easier configuration
+        presets = {
+          bottom_search = true, -- use a classic bottom cmdline for search
+          command_palette = true, -- position the cmdline and popupmenu together
+          long_message_to_split = true, -- long messages will be sent to a split
+          inc_rename = false, -- enables an input dialog for inc-rename.nvim
+          lsp_doc_border = false, -- add a border to hover docs and signature help
+        },
+      }
+    end,
+    dependencies = {
+      -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
+      'MunifTanjim/nui.nvim',
+      -- OPTIONAL:
+      --   `nvim-notify` is only needed, if you want to use the notification view.
+      --   If not available, we use `mini` as the fallback
+      'rcarriga/nvim-notify',
+    },
+  },
+
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    You can use this folder to prevent any conflicts with this init.lua if you're interested in keeping
   --    up-to-date with whatever is in the kickstart repo.
@@ -798,8 +836,8 @@ cmp.setup {
       if cmp.visible() then
         cmp.select_next_item()
       elseif luasnip.expand_or_locally_jumpable() then
-        -- luasnip.expand_or_jump()
-        vim.fn.feedkeys(vim.api.nvim_replace_termcodes('<Plug>luasnip-expand-or-jump', true, true, true), '')
+        luasnip.expand_or_jump()
+        -- vim.fn.feedkeys(vim.api.nvim_replace_termcodes('<Plug>luasnip-expand-or-jump', true, true, true), '')
       elseif vim.b._copilot_suggestion ~= nil then
         vim.fn.feedkeys(vim.api.nvim_replace_termcodes(vim.fn['copilot#Accept'](), true, true, true), '')
       else
@@ -822,6 +860,29 @@ cmp.setup {
   },
 }
 
+-- `/` cmdline setup.
+cmp.setup.cmdline('/', {
+  mapping = cmp.mapping.preset.cmdline(),
+  sources = {
+    { name = 'buffer' },
+  },
+})
+
+-- `:` cmdline setup.
+cmp.setup.cmdline(':', {
+  mapping = cmp.mapping.preset.cmdline(),
+  sources = cmp.config.sources({
+    { name = 'path' },
+  }, {
+    {
+      name = 'cmdline',
+      option = {
+        ignore_cmds = { 'Man', '!' },
+      },
+    },
+  }),
+})
+
 -- reload this vim configuration without the need to restart the whole editor
 local function reload_vim_config()
   for name, _ in pairs(package.loaded) do
@@ -841,7 +902,7 @@ local wo = vim.wo -- window options
 local bo = vim.bo -- buffer options
 local set = vim.opt -- set options
 
-local TAB_WIDTH = 4 -- I like 4 chars as a tab, setup as you wish
+local TAB_WIDTH = 2 -- I like 4 chars as a tab, setup as you wish
 wo.relativenumber = true -- relative line numbers
 set.scrolloff = 10 -- scrolling offset from top/bottom
 set.cursorline = true -- hightlight the current cursor line
@@ -925,6 +986,9 @@ vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufReadPost' }, {
 })
 vim.opt.foldlevelstart = 99
 vim.opt.foldenable = true
+-- vim.api.nvim_create_autocmd({ 'BufWinEnter' }, {
+--   command = 'silent! %foldopen!',
+-- })
 
 -- vim.cmd [[
 --   inoremap { {}<Esc>ha
@@ -991,7 +1055,7 @@ end, { desc = 'Jump to [h]arpoon file' })
 
 vim.api.nvim_create_user_command('ToTabs', function(_)
   vim.cmd [[
-    set ts=4
+    set ts=2
     set noet
     %retab!
     %s/\s\+$//e
@@ -1047,54 +1111,61 @@ vim.opt.wrapmargin = 0
 vim.opt.textwidth = 0
 vim.opt.linebreak = true
 
-require('lspconfig').ltex.setup {
-  on_attach = on_attach,
-  filetypes = { 'markdown', 'text', 'tex', 'bib' },
-  settings = {
-    ltex = {
-      languageToolHttpServerUri = 'https://api.languagetoolplus.com',
-      languageToolOrg = {
-        username = os.getenv 'LATOOL_EMAIL',
-        apiKey = os.getenv 'LATOOL_TOKEN',
-      },
-    },
-  },
-}
-
 local mason_registry = require 'mason-registry'
-local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server'
 
-local lspconfig = require 'lspconfig'
-local use_volar_hybridmode = false
-
-if use_volar_hybridmode then
-  lspconfig.ts_ls.setup {
+-- Setup the LTeX language server if it's installed
+if mason_registry.is_installed 'ltex' then
+  require('lspconfig').ltex.setup {
     on_attach = on_attach,
-
-    init_options = {
-      plugins = {
-        {
-          name = '@vue/typescript-plugin',
-          location = vue_language_server_path,
-          languages = { 'vue' },
+    filetypes = { 'markdown', 'text', 'tex', 'bib' },
+    settings = {
+      ltex = {
+        languageToolHttpServerUri = 'https://api.languagetoolplus.com',
+        languageToolOrg = {
+          username = os.getenv 'LATOOL_EMAIL',
+          apiKey = os.getenv 'LATOOL_TOKEN',
         },
       },
     },
-    filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
   }
+end
 
-  -- No need to set `hybridMode` to `true` as it's the default value
-  lspconfig.volar.setup {}
-else
-  lspconfig.volar.setup {
-    on_attach = on_attach,
-    filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue', 'json' },
-    init_options = {
-      vue = {
-        hybridMode = false,
+-- Setup Vue lsp if it's installed
+if mason_registry.is_installed 'vue-language-server' then
+  local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server'
+
+  local lspconfig = require 'lspconfig'
+  local use_volar_hybridmode = false
+
+  if use_volar_hybridmode then
+    lspconfig.ts_ls.setup {
+      on_attach = on_attach,
+
+      init_options = {
+        plugins = {
+          {
+            name = '@vue/typescript-plugin',
+            location = vue_language_server_path,
+            languages = { 'vue' },
+          },
+        },
       },
-    },
-  }
+      filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
+    }
+
+    -- No need to set `hybridMode` to `true` as it's the default value
+    lspconfig.volar.setup {}
+  else
+    lspconfig.volar.setup {
+      on_attach = on_attach,
+      filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue', 'json' },
+      init_options = {
+        vue = {
+          hybridMode = false,
+        },
+      },
+    }
+  end
 end
 
 vim.keymap.set('n', '<leader>tc', function()
