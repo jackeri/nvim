@@ -517,7 +517,13 @@ require('lazy').setup({
     'https://git.sr.ht/~whynothugo/lsp_lines.nvim',
     config = function()
       require('lsp_lines').setup()
+      -- Disable default inline diagnostics
+      -- Since we are using whynothugo/lsp_lines.nvim
+      vim.diagnostic.config {
+        virtual_text = false,
+      }
     end,
+    enabled = false, -- Disable for now.. Maybe just remove this?
   },
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
@@ -674,12 +680,6 @@ vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous dia
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
-
--- Disable default inline diagnostics
--- Since we are using whynothugo/lsp_lines.nvim
-vim.diagnostic.config({
-  virtual_text = false,
-})
 
 -- [[ Configure LSP ]]
 --  This function gets run when an LSP connects to a particular buffer.
