@@ -526,6 +526,13 @@ require('lazy').setup({
     enabled = false, -- Disable for now.. Maybe just remove this?
   },
 
+  {
+    'APZelos/blamer.nvim',
+    config = function()
+      vim.g.blamer_enabled = 1
+    end,
+  },
+
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    You can use this folder to prevent any conflicts with this init.lua if you're interested in keeping
   --    up-to-date with whatever is in the kickstart repo.
