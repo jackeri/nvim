@@ -1230,5 +1230,19 @@ vim.keymap.set('v', '<S-Right>', ':MoveHBlock(1)<CR>', opts)
 
 vim.keymap.set('n', '<leader><BS>', ':bd<CR>', { desc = 'Close buffer' })
 
+vim.filetype.add {
+  extension = {
+    vert = 'glsl',
+    frag = 'glsl',
+    geom = 'glsl',
+    tesc = 'glsl',
+    tese = 'glsl',
+    comp = 'glsl',
+  },
+  pattern = {
+    ['.*/.gitconfig-*'] = 'gitconfig',
+  },
+}
+
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
