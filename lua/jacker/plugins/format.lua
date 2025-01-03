@@ -59,7 +59,7 @@ return {
         vue = { 'prettier' },
         css = { 'prettier' },
         json = { 'prettier' },
-        yaml = { 'prettier' },
+        yaml = { 'yamlfmt' },
         markdown = { 'prettier' },
         c = is_crustify_available,
         cpp = is_crustify_available,
@@ -68,12 +68,19 @@ return {
       },
       formatters = {
         uncrustify = uncrustify,
+        yamlfmt = {
+          command = 'yamlfmt',
+          args = { '-formatter', 'retain_line_breaks_single=true,indent=2' },
+          condition = function()
+            return vim.fn.executable 'yamlfmt' == 1
+          end,
+        },
       },
-      format_on_save = {
-        lsp_fallback = false,
-        async = false,
-        timeout_ms = 5000,
-      },
+      -- format_on_save = {
+      --   lsp_fallback = false,
+      --   async = false,
+      --   timeout_ms = 5000,
+      -- },
       notify_on_error = true,
     }
     vim.keymap.set({ 'n', 'v' }, '<leader>cf', function()

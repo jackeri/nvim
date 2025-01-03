@@ -480,6 +480,7 @@ require('lazy').setup({
   {
     'folke/noice.nvim',
     event = 'VeryLazy',
+    enabled = false,
     opts = {
       -- add any options here
     },
@@ -828,7 +829,14 @@ mason_lspconfig.setup_handlers {
 local cmp = require 'cmp'
 local luasnip = require 'luasnip'
 require('luasnip.loaders.from_vscode').lazy_load()
-luasnip.config.setup {}
+
+local function setup_snippets()
+  local s = luasnip.snippet
+  local t = luasnip.text_node
+  local java_uid = s("uid", t("private static final long serialVersionUID = 1;"))
+  luasnip.add_snippets("Java", { java_uid })
+end
+setup_snippets()
 
 cmp.setup {
   snippet = {
@@ -1243,6 +1251,21 @@ vim.filetype.add {
     ['.*/.gitconfig-*'] = 'gitconfig',
   },
 }
+
+local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
+parser_config.blade = {
+  install_info = {
+    url = "https://github.com/EmranMR/tree-sitter-blade",
+    files = {"src/parser.c"},
+    branch = "main",
+  },
+  filetype = "blade"
+}
+vim.filetype.add({
+    pattern = {
+        [".*%.blade%.php"] = "blade",
+    },
+})
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
