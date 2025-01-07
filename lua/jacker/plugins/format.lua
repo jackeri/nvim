@@ -65,6 +65,7 @@ return {
         cpp = is_crustify_available,
         glsl = is_crustify_available,
         lua = { 'stylua' },
+        java = { lsp_format = 'fallback' },
       },
       formatters = {
         uncrustify = uncrustify,

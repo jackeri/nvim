@@ -775,7 +775,7 @@ local servers = {
   clangd = {
     cmd = { 'clangd', '--background-index', '--offset-encoding=utf-16' },
   },
-  gopls = {},
+  -- gopls = {},
   -- pyright = {},
   rust_analyzer = {},
   -- ts_ls = {},
@@ -833,8 +833,8 @@ require('luasnip.loaders.from_vscode').lazy_load()
 local function setup_snippets()
   local s = luasnip.snippet
   local t = luasnip.text_node
-  local java_uid = s("uid", t("private static final long serialVersionUID = 1;"))
-  luasnip.add_snippets("Java", { java_uid })
+  local java_uid = s('uid', t 'private static final long serialVersionUID = 1;')
+  luasnip.add_snippets('Java', { java_uid })
 end
 setup_snippets()
 
@@ -1141,6 +1141,27 @@ vim.opt.linebreak = true
 
 local mason_registry = require 'mason-registry'
 
+-- Check for Eclipse style configuration and set it up for JDTLS
+local eclipseStyleConfig = os.getenv 'ECLIPSE_STYLE_CONFIG'
+local eclipseStyleProfile = os.getenv 'ECLIPSE_STYLE_PROFILE'
+if mason_registry.is_installed 'jdtls' and eclipseStyleConfig and string.len(eclipseStyleConfig) > 0 and vim.loop.fs_stat(eclipseStyleConfig) then
+  require('lspconfig').jdtls.setup {
+    on_attach = on_attach,
+    capabilities = capabilities,
+    -- ... all your other stuff
+    settings = {
+      java = {
+        format = {
+          settings = {
+            url = eclipseStyleConfig,
+            profile = eclipseStyleProfile,
+          },
+        },
+      },
+    },
+  }
+end
+
 -- Setup the LTeX language server if it's installed
 if mason_registry.is_installed 'ltex' then
   require('lspconfig').ltex.setup {
@@ -1255,17 +1276,17 @@ vim.filetype.add {
 local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
 parser_config.blade = {
   install_info = {
-    url = "https://github.com/EmranMR/tree-sitter-blade",
-    files = {"src/parser.c"},
-    branch = "main",
+    url = 'https://github.com/EmranMR/tree-sitter-blade',
+    files = { 'src/parser.c' },
+    branch = 'main',
   },
-  filetype = "blade"
+  filetype = 'blade',
 }
-vim.filetype.add({
-    pattern = {
-        [".*%.blade%.php"] = "blade",
-    },
-})
+vim.filetype.add {
+  pattern = {
+    ['.*%.blade%.php'] = 'blade',
+  },
+}
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
