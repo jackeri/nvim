@@ -1273,7 +1273,7 @@ vim.filetype.add {
   },
 }
 
-local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
+local parser_config = require('nvim-treesitter.parsers').get_parser_configs()
 parser_config.blade = {
   install_info = {
     url = 'https://github.com/EmranMR/tree-sitter-blade',
@@ -1287,6 +1287,21 @@ vim.filetype.add {
     ['.*%.blade%.php'] = 'blade',
   },
 }
+
+if vim.g.neovide then
+  -- https://neovide.dev/configuration.html
+  -- NOTE: This is a workaround for the issue with macOS where the working directory is `/` at startup
+  local cwd = vim.fn.getcwd()
+  if vim.fn.has 'macunix' and cwd == '/' then
+    -- cwd = vim.fn.expand '%:p:h'
+    -- vim.api.nvim_command 'set autochdir'
+    -- vim.api.nvim_command "cd ~/programming"
+    local default_path = vim.fn.expand '~/programming'
+    print('Setting default directory to ' .. default_path)
+    vim.api.nvim_set_current_dir(default_path)
+  end
+  vim.g.neovide_scale_factor = 1.1
+end
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
