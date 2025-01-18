@@ -422,6 +422,15 @@ require('lazy').setup({
         vim.fn.feedkeys(vim.fn['copilot#Accept'] '<CR>', '')
       end, { silent = true })
     end,
+    enabled = function()
+      -- Only enable copilot if node is version 18 or greater
+      local handle = assert(io.popen('node --version', 'r'))
+      local output = assert(handle:read('*a'))
+      handle:close()
+      output = string.gsub(string.gsub(string.gsub(output, '^%s+', ''), '%s+$', ''), '[\n\r]+', ' ')
+      local major = tonumber(string.sub(output,2,3))
+      return major >= 18
+    end
   },
 
   -- ChatGPT
