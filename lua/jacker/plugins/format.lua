@@ -77,11 +77,11 @@ return {
           end,
         },
       },
-      -- format_on_save = {
-      --   lsp_fallback = false,
-      --   async = false,
-      --   timeout_ms = 5000,
-      -- },
+      format_on_save = {
+        lsp_fallback = false,
+        async = false,
+        timeout_ms = 5000,
+      },
       notify_on_error = true,
     }
     vim.keymap.set({ 'n', 'v' }, '<leader>cf', function()

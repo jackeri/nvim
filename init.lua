@@ -524,6 +524,37 @@ require('lazy').setup({
   },
 
   {
+    'rcarriga/nvim-notify',
+    enabled = true,
+    event = 'VeryLazy',
+    config = function()
+      local notify = require 'notify'
+      notify.setup {
+        background_colour = 'NotifyBackground',
+        fps = 30,
+        icons = {
+          DEBUG = '',
+          ERROR = '',
+          INFO = '',
+          TRACE = '✎',
+          WARN = '',
+        },
+        level = 2,
+        minimum_width = 50,
+        render = 'compact',
+        stages = 'fade_in_slide_out',
+        time_formats = {
+          notification = '%T',
+          notification_history = '%FT%T',
+        },
+        timeout = 5000,
+        top_down = true,
+      }
+      vim.notify = notify
+    end,
+  },
+
+  {
     'https://git.sr.ht/~whynothugo/lsp_lines.nvim',
     config = function()
       require('lsp_lines').setup()
@@ -1154,6 +1185,7 @@ local mason_registry = require 'mason-registry'
 local eclipseStyleConfig = os.getenv 'ECLIPSE_STYLE_CONFIG'
 local eclipseStyleProfile = os.getenv 'ECLIPSE_STYLE_PROFILE'
 if mason_registry.is_installed 'jdtls' and eclipseStyleConfig and string.len(eclipseStyleConfig) > 0 and vim.loop.fs_stat(eclipseStyleConfig) then
+  -- vim.uv.os_setenv("JAVA_HOME",  "/usr/lib/jvm/java-17-openjdk")
   require('lspconfig').jdtls.setup {
     on_attach = on_attach,
     capabilities = capabilities,
@@ -1193,7 +1225,7 @@ if mason_registry.is_installed 'vue-language-server' then
   local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server'
 
   local lspconfig = require 'lspconfig'
-  local use_volar_hybridmode = false
+  local use_volar_hybridmode = true
 
   if use_volar_hybridmode then
     lspconfig.ts_ls.setup {
@@ -1296,6 +1328,17 @@ vim.filetype.add {
     ['.*%.blade%.php'] = 'blade',
   },
 }
+
+-- vim.ui_attach(vim.api.nvim_create_namespace 'redirect messages', { ext_messages = true }, function(event, ...)
+--   if event == 'msg_show' then
+--     local level = vim.log.levels.INFO
+--     local kind, content = ...
+--     if string.find(kind, 'err') then
+--       level = vim.log.levels.ERROR
+--     end
+--     vim.notify(content, level, { title = 'Message' })
+--   end
+-- end)
 
 if vim.g.neovide then
   -- https://neovide.dev/configuration.html
