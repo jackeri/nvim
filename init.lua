@@ -1181,11 +1181,46 @@ vim.opt.linebreak = true
 
 local mason_registry = require 'mason-registry'
 
--- Check for Eclipse style configuration and set it up for JDTLS
-local eclipseStyleConfig = os.getenv 'ECLIPSE_STYLE_CONFIG'
-local eclipseStyleProfile = os.getenv 'ECLIPSE_STYLE_PROFILE'
-if mason_registry.is_installed 'jdtls' and eclipseStyleConfig and string.len(eclipseStyleConfig) > 0 and vim.loop.fs_stat(eclipseStyleConfig) then
-  -- vim.uv.os_setenv("JAVA_HOME",  "/usr/lib/jvm/java-17-openjdk")
+-- Setup the LSP servers for Java
+local function setup_jdtls(registry)
+  if not registry.is_installed 'jdtls' then
+    return
+  end
+  local settingsTable = nil
+  local cfgPath = nil
+
+  -- Try to find a local style.xml file for JDTLS formatter
+  local cwd = vim.fn.getcwd()
+  cfgPath = cwd .. '/style.xml'
+  if not vim.loop.fs_stat(cfgPath) then
+    -- Try to find a local style/style.xml file for JDTLS formatter
+    cfgPath = cwd .. '/style/style.xml'
+    if not vim.loop.fs_stat(cfgPath) then
+      cfgPath = nil
+    end
+  end
+
+  if cfgPath then
+    settingsTable = { url = cfgPath }
+  else
+    -- Check for Eclipse style configuration and set it up for JDTLS
+    local eclipseStyleConfig = os.getenv 'ECLIPSE_STYLE_CONFIG'
+    local eclipseStyleProfile = os.getenv 'ECLIPSE_STYLE_PROFILE'
+    if eclipseStyleConfig and string.len(eclipseStyleConfig) > 0 and vim.loop.fs_stat(eclipseStyleConfig) then
+      settingsTable = {
+        url = eclipseStyleConfig,
+        profile = eclipseStyleProfile,
+      }
+    end
+  end
+
+  if not settingsTable then
+    print 'No style configuration found for JDTLS'
+    return
+  else
+    print 'Using style configuration for JDTLS'
+  end
+
   require('lspconfig').jdtls.setup {
     on_attach = on_attach,
     capabilities = capabilities,
@@ -1193,15 +1228,15 @@ if mason_registry.is_installed 'jdtls' and eclipseStyleConfig and string.len(ecl
     settings = {
       java = {
         format = {
-          settings = {
-            url = eclipseStyleConfig,
-            profile = eclipseStyleProfile,
-          },
+          settings = settingsTable,
         },
       },
     },
   }
+
 end
+
+setup_jdtls(mason_registry)
 
 -- Setup the LTeX language server if it's installed
 if mason_registry.is_installed 'ltex' then
