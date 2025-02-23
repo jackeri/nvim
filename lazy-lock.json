@@ -3,7 +3,7 @@
   "LuaSnip": { "branch": "master", "commit": "c9b9a22904c97d0eb69ccb9bab76037838326817" },
   "blamer.nvim": { "branch": "master", "commit": "e0d43c11697300eb68f00d69df8b87deb0bf52dc" },
   "centerpad.nvim": { "branch": "main", "commit": "666641d02fd8c58ac401c1fb6bf596bb00b815fb" },
-  "cmake-tools.nvim": { "branch": "master", "commit": "fccf6ce5f8ad2fde01e9e70797d78a6abbef7146" },
+  "cmake-tools.nvim": { "branch": "master", "commit": "72a5eb8fd330da3e4a5f9ca0722ebf423f54bc8e" },
   "cmp-cmdline": { "branch": "main", "commit": "d250c63aa13ead745e3a40f61fdd3470efde3923" },
   "cmp-nvim-lsp": { "branch": "main", "commit": "99290b3ec1322070bcfb9e846450a46f6efa50f0" },
   "cmp_luasnip": { "branch": "master", "commit": "98d9cb5c2c38532bd9bdb481067b20fea8f32e90" },
@@ -34,7 +34,7 @@
   "nvim-notify": { "branch": "master", "commit": "22f29093eae7785773ee9d543f8750348b1a195c" },
   "nvim-surround": { "branch": "main", "commit": "ae298105122c87bbe0a36b1ad20b06d417c0433e" },
   "nvim-tree.lua": { "branch": "master", "commit": "6709463b2d18e77f7a946027917aa00d4aaed6f4" },
-  "nvim-treesitter": { "branch": "master", "commit": "5774e7d3da4f681296a87fcd85d17779ad362a4f" },
+  "nvim-treesitter": { "branch": "master", "commit": "f2bd62c6568de54ca1b8fb0a8de04a41442934cb" },
   "nvim-treesitter-textobjects": { "branch": "master", "commit": "ad8f0a472148c3e0ae9851e26a722ee4e29b1595" },
   "nvim-web-devicons": { "branch": "master", "commit": "1020869742ecb191f260818234517f4a1515cfe8" },
   "onedark.nvim": { "branch": "master", "commit": "67a74c275d1116d575ab25485d1bfa6b2a9c38a6" },
@@ -51,5 +51,5 @@
   "vim-sleuth": { "branch": "master", "commit": "be69bff86754b1aa5adcbb527d7fcd1635a84080" },
   "vim-visual-multi": { "branch": "master", "commit": "a6975e7c1ee157615bbc80fc25e4392f71c344d4" },
   "vimtex": { "branch": "master", "commit": "63ae2e94b0fabc6bdad0a685c1ef0a7e0705fe7b" },
-  "which-key.nvim": { "branch": "main", "commit": "5bf7a73fe851896d5ac26d313db849bf00f45b78" }
+  "which-key.nvim": { "branch": "main", "commit": "370ec46f710e058c9c1646273e6b225acf47cbed" }
 }
