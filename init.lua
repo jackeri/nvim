@@ -1189,24 +1189,28 @@ vim.opt.linebreak = true
 
 local mason_registry = require 'mason-registry'
 
+local function find_format_file(cwd, file)
+  local cfgPath = cwd .. '/' .. file
+  if not vim.loop.fs_stat(cfgPath) then
+    cfgPath = cwd .. '/style/' .. file
+    if not vim.loop.fs_stat(cfgPath) then
+      cfgPath = nil
+    end
+  end
+  return cfgPath
+end
+
 -- Setup the LSP servers for Java
 local function setup_jdtls(registry)
   if not registry.is_installed 'jdtls' then
     return
   end
   local settingsTable = nil
-  local cfgPath = nil
 
   -- Try to find a local style.xml file for JDTLS formatter
   local cwd = vim.fn.getcwd()
-  cfgPath = cwd .. '/style.xml'
-  if not vim.loop.fs_stat(cfgPath) then
-    -- Try to find a local style/style.xml file for JDTLS formatter
-    cfgPath = cwd .. '/style/style.xml'
-    if not vim.loop.fs_stat(cfgPath) then
-      cfgPath = nil
-    end
-  end
+  local cfgPath = find_format_file(cwd, 'style.xml')
+  local importOrderFile = find_format_file(cwd, 'style.importorder')
 
   if cfgPath then
     settingsTable = { url = cfgPath }
@@ -1223,10 +1227,35 @@ local function setup_jdtls(registry)
   end
 
   if not settingsTable then
-    print 'No style configuration found for JDTLS'
     return
-  else
-    print 'Using style configuration for JDTLS'
+  end
+
+  local importOrderTable = {
+    "java",
+    "jakarta",
+    "javax",
+    "com",
+    "org",
+  }
+  if importOrderFile then
+    local file = io.open(importOrderFile, 'r')
+    local order = {}
+    if file then
+      for line in file:lines() do
+        if line:sub(1, 1) == '#' then
+          goto continue
+        end
+        local offset = line:find('=')
+        if not offset then
+          goto continue
+        end
+        local key = line:sub(offset + 1):gsub("%s+", "")
+        table.insert(order, key)
+        ::continue::
+      end
+      file:close()
+      importOrderTable = order
+    end
   end
 
   require('lspconfig').jdtls.setup {
@@ -1238,6 +1267,7 @@ local function setup_jdtls(registry)
         format = {
           settings = settingsTable,
         },
+        importOrder = importOrderTable,
       },
     },
   }
