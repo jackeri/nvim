@@ -1298,7 +1298,7 @@ if mason_registry.is_installed 'vue-language-server' then
   local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server'
 
   local lspconfig = require 'lspconfig'
-  local use_volar_hybridmode = true
+  local use_volar_hybridmode = false
 
   if use_volar_hybridmode then
     lspconfig.ts_ls.setup {
