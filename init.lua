@@ -97,9 +97,9 @@ require('lazy').setup({
   {
     'L3MON4D3/LuaSnip',
     -- follow latest release.
-    version = "v2.*", -- Replace <CurrentMajor> by the latest released major (first number of latest release)
+    version = 'v2.*', -- Replace <CurrentMajor> by the latest released major (first number of latest release)
     -- install jsregexp (optional!).
-    build = "make install_jsregexp"
+    build = 'make install_jsregexp',
   },
 
   {
@@ -433,12 +433,12 @@ require('lazy').setup({
     enabled = function()
       -- Only enable copilot if node is version 18 or greater
       local handle = assert(io.popen('node --version', 'r'))
-      local output = assert(handle:read('*a'))
+      local output = assert(handle:read '*a')
       handle:close()
       output = string.gsub(string.gsub(string.gsub(output, '^%s+', ''), '%s+$', ''), '[\n\r]+', ' ')
-      local major = tonumber(string.sub(output,2,3))
+      local major = tonumber(string.sub(output, 2, 3))
       return major >= 18
-    end
+    end,
   },
 
   -- ChatGPT
@@ -580,6 +580,27 @@ require('lazy').setup({
     config = function()
       vim.g.blamer_enabled = 1
     end,
+  },
+
+  {
+    'kdheepak/lazygit.nvim',
+    lazy = true,
+    cmd = {
+      'LazyGit',
+      'LazyGitConfig',
+      'LazyGitCurrentFile',
+      'LazyGitFilter',
+      'LazyGitFilterCurrentFile',
+    },
+    -- optional for floating window border decoration
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+    },
+    -- setting the keybinding for LazyGit with 'keys' is recommended in
+    -- order to load the plugin when the command is run for the first time
+    keys = {
+      { '<leader>lg', '<cmd>LazyGit<cr>', desc = 'LazyGit' },
+    },
   },
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
@@ -795,6 +816,7 @@ require('which-key').add {
   { '<leader>v', group = '[V]im' },
   { '<leader>vr', group = '[V]im [R]reload' },
   { '<leader>u', group = '[U]ndo tree' },
+  { '<leader>l', group = '[L]azy' },
   { 'C-n', group = 'Multicursor select word' },
 }
 
@@ -1231,11 +1253,11 @@ local function setup_jdtls(registry)
   end
 
   local importOrderTable = {
-    "java",
-    "jakarta",
-    "javax",
-    "com",
-    "org",
+    'java',
+    'jakarta',
+    'javax',
+    'com',
+    'org',
   }
   if importOrderFile then
     local file = io.open(importOrderFile, 'r')
@@ -1245,11 +1267,11 @@ local function setup_jdtls(registry)
         if line:sub(1, 1) == '#' then
           goto continue
         end
-        local offset = line:find('=')
+        local offset = line:find '='
         if not offset then
           goto continue
         end
-        local key = line:sub(offset + 1):gsub("%s+", "")
+        local key = line:sub(offset + 1):gsub('%s+', '')
         table.insert(order, key)
         ::continue::
       end
@@ -1271,7 +1293,6 @@ local function setup_jdtls(registry)
       },
     },
   }
-
 end
 
 setup_jdtls(mason_registry)
