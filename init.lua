@@ -1336,9 +1336,6 @@ local function setup_jdtls(registry)
         referencesCodeLens = {
           enabled = true,
         },
-        signatureHelp = {
-          enabled = true,
-        },
       },
     },
   }
