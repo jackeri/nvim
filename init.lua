@@ -1290,6 +1290,55 @@ local function setup_jdtls(registry)
           settings = settingsTable,
         },
         importOrder = importOrderTable,
+        signatureHelp = { enabled = true },
+        contentProvider = { preferred = 'fernflower' }, -- Use fernflower to decompile library code
+        -- Specify any completion options
+        completion = {
+          favoriteStaticMembers = {
+            'org.hamcrest.MatcherAssert.assertThat',
+            'org.hamcrest.Matchers.*',
+            'org.hamcrest.CoreMatchers.*',
+            'org.junit.jupiter.api.Assertions.*',
+            'java.util.Objects.requireNonNull',
+            'java.util.Objects.requireNonNullElse',
+            'org.mockito.Mockito.*',
+          },
+          filteredTypes = {
+            'com.sun.*',
+            'io.micrometer.shaded.*',
+            'java.awt.*',
+            'jdk.*',
+            'sun.*',
+          },
+        },
+        -- How code generation should act
+        codeGeneration = {
+          toString = {
+            template = '${object.className}{${member.name()}=${member.value}, ${otherMembers}}',
+          },
+          hashCodeEquals = {
+            useJava7Objects = true,
+          },
+          useBlocks = true,
+        },
+        eclipse = {
+          downloadSources = true,
+          -- jdtls = {
+          --   vmargs = '-javaagent:/path/to/lombok.jar',
+          -- },
+        },
+        maven = {
+          downloadSources = true,
+        },
+        implementationsCodeLens = {
+          enabled = true,
+        },
+        referencesCodeLens = {
+          enabled = true,
+        },
+        signatureHelp = {
+          enabled = true,
+        },
       },
     },
   }
@@ -1422,6 +1471,11 @@ vim.filetype.add {
     ['.*%.blade%.php'] = 'blade',
   },
 }
+
+-- Copy file path to clipboard
+vim.keymap.set('n', '<leader>fr', ':let @+ = expand("%")<CR>', { desc = 'Copy [f]ile [r]elative path to clipboard', noremap = true, silent = true })
+vim.keymap.set('n', '<leader>ff', ':let @+ = expand("%:p")<CR>', { desc = 'Copy [f]ile [f]ull path to clipboard', noremap = true, silent = true })
+vim.keymap.set('n', '<leader>fn', ':let @+ = expand("%:t")<CR>', { desc = 'Copy [f]ile file[n]ame to clipboard', noremap = true, silent = true })
 
 -- vim.ui_attach(vim.api.nvim_create_namespace 'redirect messages', { ext_messages = true }, function(event, ...)
 --   if event == 'msg_show' then
