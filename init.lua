@@ -1274,25 +1274,16 @@ local function setup_jdtls(registry)
     local vms = vim.fn.expand '/Library/Java/JavaVirtualMachines/*/Contents/Home'
     local highest_jvm = -1
     for jdk in vms:gmatch '[^\r\n]+' do
-      -- local testike = parse_jdk_version(jdk)
-      local jdk_rel = vim.fn.glob(jdk .. '/release')
-      if vim.loop.fs_stat(jdk_rel) then
-        local text = vim.fn.readfile(jdk_rel)
-        for _, line in ipairs(text) do
-          if line:match 'JAVA_VERSION' then
-            local version_ok, jdk_version = pcall(tonumber, line:match '([0-9]+)%.?')
-            if version_ok and type(jdk_version) == 'number' then
-              if jdk_version > highest_jvm then
-                highest_jvm = jdk_version
-              end
-              table.insert(java_paths, {
-                name = 'Java-' .. jdk_version,
-                path = jdk,
-              })
-            end
-            break
-          end
+      local jdk_version = parse_jdk_version(jdk)
+
+      if jdk_version then
+        if jdk_version > highest_jvm then
+          highest_jvm = jdk_version
         end
+        table.insert(java_paths, {
+          name = 'Java-' .. jdk_version,
+          path = jdk,
+        })
       end
     end
 
@@ -1340,8 +1331,8 @@ local function setup_jdtls(registry)
       end
     end
 
-    if java_version == nil then
-      vim.notify('No valid JDK found, please set JAVA_HOME', vim.log.levels.ERROR)
+    if java_version == nil or java_version < 21 then
+      vim.notify('No valid JDK(version >= 21) found, please set JAVA_HOME', vim.log.levels.ERROR)
       return
     else
       vim.notify('Using JDK ' .. java_version .. ' from ' .. vim.env.JAVA_HOME, vim.log.levels.INFO)
