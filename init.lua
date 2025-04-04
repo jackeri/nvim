@@ -1252,6 +1252,104 @@ local function setup_jdtls(registry)
     return
   end
 
+  local function parse_jdk_version(path)
+    local jdk_rel = vim.fn.glob(path .. '/release')
+    if vim.loop.fs_stat(jdk_rel) then
+      local text = vim.fn.readfile(jdk_rel)
+      for _, line in ipairs(text) do
+        if line:match 'JAVA_VERSION' then
+          local version_ok, jdk_version = pcall(tonumber, line:match '([0-9]+)%.?')
+          if version_ok and type(jdk_version) == 'number' then
+            return jdk_version
+          end
+        end
+      end
+    end
+    return nil
+  end
+
+  local java_paths = {}
+
+  if vim.fn.has 'macunix' == 1 then
+    local vms = vim.fn.expand '/Library/Java/JavaVirtualMachines/*/Contents/Home'
+    local highest_jvm = -1
+    for jdk in vms:gmatch '[^\r\n]+' do
+      -- local testike = parse_jdk_version(jdk)
+      local jdk_rel = vim.fn.glob(jdk .. '/release')
+      if vim.loop.fs_stat(jdk_rel) then
+        local text = vim.fn.readfile(jdk_rel)
+        for _, line in ipairs(text) do
+          if line:match 'JAVA_VERSION' then
+            local version_ok, jdk_version = pcall(tonumber, line:match '([0-9]+)%.?')
+            if version_ok and type(jdk_version) == 'number' then
+              if jdk_version > highest_jvm then
+                highest_jvm = jdk_version
+              end
+              table.insert(java_paths, {
+                name = 'Java-' .. jdk_version,
+                path = jdk,
+              })
+            end
+            break
+          end
+        end
+      end
+    end
+
+    for _, jdk in ipairs(java_paths) do
+      if jdk.name == 'Java-' .. highest_jvm then
+        jdk.default = true
+      end
+    end
+  else
+    local java_home = os.getenv 'JAVA_HOME'
+    if java_home and string.len(java_home) > 0 then
+      local java_home_path = vim.fn.expand(java_home)
+      if vim.loop.fs_stat(java_home_path) then
+        table.insert(java_paths.runtimes, {
+          path = java_home_path,
+          name = 'Java',
+          default = true,
+        })
+      end
+    end
+  end
+
+  -- Check if the JAVA_HOME is set and if it points to a valid JDK
+  -- If not, set it to the highest version found
+  -- This is a workaround for the JDTLS not being able to find the JDK
+  local function check_and_set_jvm()
+    local java_home = os.getenv 'JAVA_HOME'
+    local java_version = nil
+    if java_home and string.len(java_home) > 0 then
+      java_version = parse_jdk_version(java_home)
+    end
+
+    -- JDTLS requires Java 21 or higher
+    if java_version and java_version > 20 then
+      return
+    end
+
+    for _, jdk in ipairs(java_paths) do
+      local version_ok, jdk_version = pcall(tonumber, jdk.path:match '([0-9]+)%.?')
+      if version_ok and type(jdk_version) == 'number' then
+        if java_version == nil or jdk_version > java_version then
+          java_version = jdk_version
+          vim.uv.os_setenv('JAVA_HOME', jdk.path)
+        end
+      end
+    end
+
+    if java_version == nil then
+      vim.notify('No valid JDK found, please set JAVA_HOME', vim.log.levels.ERROR)
+      return
+    else
+      vim.notify('Using JDK ' .. java_version .. ' from ' .. vim.env.JAVA_HOME, vim.log.levels.INFO)
+    end
+  end
+
+  check_and_set_jvm()
+
   local importOrderTable = {
     'java',
     'jakarta',
@@ -1335,6 +1433,9 @@ local function setup_jdtls(registry)
         },
         referencesCodeLens = {
           enabled = true,
+        },
+        configuration = {
+          runtimes = java_paths,
         },
       },
     },
