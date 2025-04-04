@@ -116,6 +116,9 @@ require('lazy').setup({
       -- Adds a number of user-friendly snippets
       'rafamadriz/friendly-snippets',
       'hrsh7th/cmp-cmdline',
+
+      -- Add html & css completion
+      'Jezda1337/nvim-html-css',
     },
   },
 
@@ -955,6 +958,30 @@ cmp.setup {
   sources = {
     { name = 'nvim_lsp' },
     { name = 'luasnip' },
+    {
+      name = 'html-css',
+      option = {
+        enable_on = { 'html', 'vue' }, -- html is enabled by default
+        notify = false,
+        documentation = {
+          auto_show = true, -- show documentation on select
+        },
+        -- add any external scss like one below
+        style_sheets = {
+          'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',
+          'https://cdn.jsdelivr.net/npm/bulma@1.0.3/css/bulma.min.css',
+        },
+      },
+    },
+  },
+  formatting = {
+    format = function(entry, vim_item)
+      local source = entry.source.name
+      if source == 'html-css' then
+        vim_item.menu = '[' .. entry.completion_item.provider .. ']' or '[html-css]'
+      end
+      return vim_item
+    end,
   },
 }
 
