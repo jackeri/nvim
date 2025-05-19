@@ -82,8 +82,15 @@ require('lazy').setup({
     'neovim/nvim-lspconfig',
     dependencies = {
       -- Automatically install LSPs to stdpath for neovim
-      'williamboman/mason.nvim',
-      'williamboman/mason-lspconfig.nvim',
+      {
+        'mason-org/mason-lspconfig.nvim',
+        version = '2.0.0',
+        opts = {},
+        dependencies = {
+          { 'mason-org/mason.nvim', opts = {} },
+          'neovim/nvim-lspconfig',
+        },
+      },
 
       -- Useful status updates for LSP
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
@@ -761,6 +768,7 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 -- [[ Configure LSP ]]
 --  This function gets run when an LSP connects to a particular buffer.
 local on_attach = function(_, bufnr)
+  print('LSP: on_attach', bufnr)
   -- NOTE: Remember that lua is a real programming language, and as such it is possible
   -- to define small helper and utility functions so you don't have to repeat yourself
   -- many times.
@@ -831,7 +839,7 @@ require('mason').setup {
     },
   },
 }
-require('mason-lspconfig').setup()
+-- require('mason-lspconfig').setup()
 
 -- Enable the following language servers
 --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
@@ -873,11 +881,26 @@ capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 
 -- Ensure the servers above are installed
 local mason_lspconfig = require 'mason-lspconfig'
+print('mason_lspconfig', mason_lspconfig.setup_handlers)
 
 mason_lspconfig.setup {
   ensure_installed = vim.tbl_keys(servers),
 }
 
+for server_name, _ in pairs(servers) do
+  local server_opts = {
+    -- capabilities = capabilities,
+    on_attach = on_attach,
+    settings = servers[server_name],
+    filetypes = (servers[server_name] or {}).filetypes,
+  }
+  if servers[server_name] and servers[server_name].cmd then
+    server_opts['cmd'] = servers[server_name].cmd
+  end
+  vim.lsp.config(server_name, server_opts)
+end
+
+--[[
 mason_lspconfig.setup_handlers {
   function(server_name)
     local config = {
@@ -893,6 +916,7 @@ mason_lspconfig.setup_handlers {
     require('lspconfig')[server_name].setup(config)
   end,
 }
+--]]
 
 -- [[ Configure nvim-cmp ]]
 -- See `:help cmp`
@@ -1454,10 +1478,13 @@ end
 
 -- Setup Vue lsp if it's installed
 if mason_registry.is_installed 'vue-language-server' then
-  local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server'
+  -- print('Mason registry' .. vim.inspect(mason_registry))
+  local package = mason_registry.get_package 'vue-language-server'
+  -- local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server'
+  local vue_language_server_path = vim.fn.expand('$MASON/bin/' .. package.name)
 
   local lspconfig = require 'lspconfig'
-  local use_volar_hybridmode = false
+  local use_volar_hybridmode = true
 
   if use_volar_hybridmode then
     lspconfig.ts_ls.setup {
