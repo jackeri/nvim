@@ -61,6 +61,7 @@ return {
         json = { 'prettier' },
         yaml = { 'yamlfmt' },
         markdown = { 'prettier' },
+        go = { 'gofmt' },
         c = is_crustify_available,
         cpp = is_crustify_available,
         glsl = is_crustify_available,

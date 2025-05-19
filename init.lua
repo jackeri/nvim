@@ -73,7 +73,7 @@ require('lazy').setup({
   'tpope/vim-rhubarb',
 
   -- Detect tabstop and shiftwidth automatically
-  'tpope/vim-sleuth',
+  { 'tpope/vim-sleuth', event = 'VeryLazy' },
 
   -- NOTE: This is where your plugins related to LSP can be installed.
   --  The configuration is done below. Search for lspconfig to find it below.
@@ -1335,7 +1335,7 @@ local function setup_jdtls(registry)
       vim.notify('No valid JDK(version >= 21) found, please set JAVA_HOME', vim.log.levels.ERROR)
       return
     else
-      vim.notify('Using JDK ' .. java_version .. ' from ' .. vim.env.JAVA_HOME, vim.log.levels.INFO)
+      -- vim.notify('Using JDK ' .. java_version .. ' from ' .. vim.env.JAVA_HOME, vim.log.levels.INFO)
     end
   end
 
@@ -1425,9 +1425,9 @@ local function setup_jdtls(registry)
         referencesCodeLens = {
           enabled = true,
         },
-        configuration = {
-          runtimes = java_paths,
-        },
+        -- configuration = {
+        --   runtimes = java_paths,
+        -- },
       },
     },
   }
