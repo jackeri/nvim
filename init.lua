@@ -1151,14 +1151,20 @@ vim.keymap.set('n', '<leader>h', function()
   harpoon:list():select(c)
 end, { desc = 'Jump to [h]arpoon file' })
 
-vim.api.nvim_create_user_command('ToTabs', function(_)
-  vim.cmd [[
-    set ts=2
+vim.api.nvim_create_user_command('ToTabs', function(props)
+  local ts
+  if props.args == nil or props.args == '' then
+    ts = 4
+  else
+    ts = tonumber(props.args)
+  end
+  vim.cmd('set ts=' .. ts .. [[
+
     set noet
     %retab!
     %s/\s\+$//e
-  ]]
-end, { desc = 'Change current buffers indentation to tabs (expects 4 spaces)' })
+  ]])
+end, { desc = 'Change current buffers indentation to tabs (defaults to 4 spaces)', nargs = '?' })
 
 -- disable netrw at the very start of your init.lua
 vim.g.loaded_netrw = 1
