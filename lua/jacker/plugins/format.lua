@@ -67,6 +67,7 @@ return {
         glsl = is_crustify_available,
         lua = { 'stylua' },
         java = { lsp_format = 'fallback' },
+        rust = { 'rustfmt' },
       },
       formatters = {
         uncrustify = uncrustify,
