@@ -782,7 +782,7 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('config-lsp-attach', { clear = true }),
   callback = function(event)
-    print 'LSP started.'
+    vim.notify('LSP started', vim.log.levels.DEBUG)
     -- In this case, we create a function that lets us more easily define mappings specific
     -- for LSP related items. It sets the mode, buffer and description for us each time.
     local nmap = function(keys, func, desc, mode)
@@ -813,7 +813,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
     nmap('<leader>wa', vim.lsp.buf.add_workspace_folder, '[W]orkspace [A]dd Folder')
     nmap('<leader>wr', vim.lsp.buf.remove_workspace_folder, '[W]orkspace [R]emove Folder')
     nmap('<leader>wl', function()
-      print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+      vim.notify(vim.inspect(vim.lsp.buf.list_workspace_folders()), vim.log.levels.INFO)
     end, '[W]orkspace [L]ist Folders')
 
     -- Create a command `:Format` local to the LSP buffer
@@ -960,7 +960,6 @@ local capabilities = require('blink.cmp').get_lsp_capabilities()
 
 -- Ensure the servers above are installed
 local mason_lspconfig = require 'mason-lspconfig'
-print('mason_lspconfig', mason_lspconfig.setup_handlers)
 
 mason_lspconfig.setup {
   ensure_installed = {},
@@ -1082,6 +1081,7 @@ local g = vim.g -- global options
 local wo = vim.wo -- window options
 local bo = vim.bo -- buffer options
 local set = vim.opt -- set options
+local notify = require 'notify'
 
 local TAB_WIDTH = 2 -- I like 4 chars as a tab, setup as you wish
 wo.relativenumber = true -- relative line numbers
@@ -1149,7 +1149,7 @@ vim.keymap.set('n', '<C-u>', '<C-u>zz', { desc = 'Mode down and center screen' }
 vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufRead' }, {
   pattern = { 'Jenkinsfile' },
   callback = function(_)
-    print 'Jenkinsfile detected'
+    notify('Jenkinsfile detected', vim.log.levels.INFO)
     vim.o.syntax = 'groovy'
   end,
   -- command = 'set syntax=groovy'
@@ -1167,18 +1167,6 @@ vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufReadPost' }, {
 })
 vim.opt.foldlevelstart = 99
 vim.opt.foldenable = true
--- vim.api.nvim_create_autocmd({ 'BufWinEnter' }, {
---   command = 'silent! %foldopen!',
--- })
-
--- vim.cmd [[
---   inoremap { {}<Esc>ha
---   inoremap ( ()<Esc>ha
---   inoremap [ []<Esc>ha
---   inoremap " ""<Esc>ha
---   inoremap ' ''<Esc>ha
---   inoremap ` ``<Esc>ha
--- ]]
 
 -- Escape terminal mode with Contro-space
 vim.keymap.set('t', '<C-space>', '<C-\\><C-n>', { silent = true })
@@ -1421,7 +1409,7 @@ local function setup_jdtls(registry)
     end
 
     if java_version == nil or java_version < 21 then
-      vim.notify('No valid JDK(version >= 21) found, please set JAVA_HOME', vim.log.levels.ERROR)
+      notify('No valid JDK(version >= 21) found, please set JAVA_HOME', vim.log.levels.ERROR)
       return
     else
       -- vim.notify('Using JDK ' .. java_version .. ' from ' .. vim.env.JAVA_HOME, vim.log.levels.INFO)
@@ -1525,12 +1513,12 @@ setup_jdtls(mason_registry)
 
 local function setup_vue_ls(registry)
   if not registry.is_installed 'vue-language-server' then
-    print 'Vue language server not installed'
+    vim.notify('Vue language server not installed', vim.log.levels.ERROR)
     return
   end
 
   if not registry.is_installed 'vtsls' then
-    print 'Vtsls language server not installed'
+    vim.notify('Vtsls language server not installed', vim.log.levels.ERROR)
     return
   end
 
@@ -1707,7 +1695,7 @@ if vim.g.neovide then
     -- vim.api.nvim_command 'set autochdir'
     -- vim.api.nvim_command "cd ~/programming"
     local default_path = vim.fn.expand '~/programming'
-    print('Setting default directory to ' .. default_path)
+    notify('Setting default directory to ' .. default_path, vim.log.levels.INFO)
     vim.api.nvim_set_current_dir(default_path)
   end
   vim.g.neovide_scale_factor = 1.1
