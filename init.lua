@@ -971,7 +971,8 @@ mason_lspconfig.setup {
       -- by the server configuration above. Useful when disabling
       -- certain features of an LSP (for example, turning off formatting for ts_ls)
       server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-      require('lspconfig')[server_name].setup(server)
+      vim.lsp.config(server_name, server)
+      vim.lsp.enable(server_name)
     end,
   },
 }
@@ -1446,7 +1447,7 @@ local function setup_jdtls(registry)
     end
   end
 
-  require('lspconfig').jdtls.setup {
+  vim.lsp.config('jdtls', {
     capabilities = capabilities,
     -- ... all your other stuff
     settings = {
@@ -1506,7 +1507,7 @@ local function setup_jdtls(registry)
         -- },
       },
     },
-  }
+  })
 end
 
 setup_jdtls(mason_registry)
@@ -1585,7 +1586,7 @@ setup_vue_ls(mason_registry)
 
 -- Setup the LTeX language server if it's installed
 if mason_registry.is_installed 'ltex' then
-  require('lspconfig').ltex.setup {
+  vim.lsp.config('ltex', {
     filetypes = { 'markdown', 'text', 'tex', 'bib' },
     settings = {
       ltex = {
@@ -1596,7 +1597,8 @@ if mason_registry.is_installed 'ltex' then
         },
       },
     },
-  }
+  })
+  vim.lsp.enable 'ltex'
 end
 
 vim.keymap.set('n', '<leader>tc', function()
