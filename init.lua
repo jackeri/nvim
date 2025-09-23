@@ -903,7 +903,6 @@ require('mason').setup {
     },
   },
 }
--- require('mason-lspconfig').setup()
 
 -- Enable the following language servers
 --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
