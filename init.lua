@@ -277,6 +277,7 @@ require('lazy').setup({
       -- See `:help telescope.builtin`
       vim.keymap.set('n', '<leader>?', builtin.oldfiles, { desc = '[?] Find recently opened files' })
       vim.keymap.set('n', '<leader><space>', builtin.buffers, { desc = '[ ] Find existing buffers' })
+      vim.keymap.set('n', '<D-e>', builtin.buffers, { desc = '[ ] Find existing buffers' })
       vim.keymap.set('n', '<leader>/', function()
         -- You can pass additional configuration to telescope to change theme, layout, etc.
         builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
@@ -1446,11 +1447,41 @@ local function setup_jdtls(registry)
     end
   end
 
+  local home = os.getenv 'HOME'
+  local root_dir = vim.fs.dirname(vim.fs.find({ 'mvnw', 'gradlew', 'pom.xml', 'build.gradle' }, { upward = true })[1])
+  local workspace_folder = home .. '/.local/share/eclipse/' .. vim.fn.fnamemodify(root_dir, ':p:h:t')
+
   vim.lsp.config('jdtls', {
     capabilities = capabilities,
+
+    cmd = {
+      vim.fn.expand '$MASON/packages' .. '/jdtls/bin/jdtls',
+      '-data',
+      workspace_folder,
+      '--jvm-arg=-javaagent:' .. vim.fn.expand '$MASON/packages' .. '/jdtls/lombok.jar',
+      '--jvm-arg=-Xmx1G',
+      '--jvm-arg=-XX:+UseG1GC',
+      '--jvm-arg=-XX:+UseStringDeduplication',
+      '--add-modules=ALL-SYSTEM',
+      '--add-opens',
+      'java.base/java.util=ALL-UNNAMED',
+      '--add-opens',
+      'java.base/java.lang=ALL-UNNAMED',
+    },
+
+    root_markers = { 'mvnw', 'gradlew', '.git', 'pom.xml', 'build.gradle' },
+
     -- ... all your other stuff
     settings = {
       java = {
+        import = {
+          gradle = {
+            enabled = false,
+          },
+          maven = {
+            enabled = false,
+          },
+        },
         format = {
           settings = settingsTable,
         },
