@@ -802,7 +802,13 @@ vim.api.nvim_create_autocmd('LspAttach', {
     nmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
 
     nmap('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
-    nmap('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
+    nmap('gr', function()
+      require('telescope.builtin').lsp_references {
+        show_line = false,
+        include_declaration = false,
+        sorting_strategy = 'ascending',
+      }
+    end, '[G]oto [R]eferences')
     nmap('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
     nmap('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
     nmap('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
