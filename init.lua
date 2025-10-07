@@ -1491,8 +1491,16 @@ local function setup_jdtls(registry)
         importOrder = importOrderTable,
         signatureHelp = { enabled = true },
         contentProvider = { preferred = 'fernflower' }, -- Use fernflower to decompile library code
+        sources = {
+          organizeImports = {
+            starThreshold = 4,
+            staticStarThreshold = 4,
+          },
+        },
         -- Specify any completion options
         completion = {
+          useWildcard = true,
+          wildcardTrigger = 4,
           favoriteStaticMembers = {
             'org.hamcrest.MatcherAssert.assertThat',
             'org.hamcrest.Matchers.*',
