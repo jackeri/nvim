@@ -1688,7 +1688,7 @@ vim.keymap.set('v', '<S-Up>', ':MoveBlock(-1)<CR>', opts)
 vim.keymap.set('v', '<S-Left>', ':MoveHBlock(-1)<CR>', opts)
 vim.keymap.set('v', '<S-Right>', ':MoveHBlock(1)<CR>', opts)
 
-vim.keymap.set('n', '<leader><BS>', ':bd<CR>', { desc = 'Close buffer' })
+vim.keymap.set('n', '<leader><BS>', ':bd<CR>', { desc = 'Close buffer', silent = true, noremap = true })
 
 vim.filetype.add {
   extension = {
