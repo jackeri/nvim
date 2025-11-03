@@ -44,6 +44,17 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 vim.g.have_nerd_font = true
 
+UseNetrw = true
+if UseNetrw then
+  vim.g.netrw_keepdir = 0
+  vim.g.netrw_banner = 0
+  vim.g.netrw_list_hide = '\\(^\\|\\s\\s\\)\zs\\.\\S\\+'
+  vim.g.netrw_localcopydircmd = 'cp -r'
+  vim.g.netrw_winsize = 30
+  -- vim.keymap.set('n', '<c-p>', ':Vexplore %:p:h<CR>', { desc = 'Toggle NvimTree', silent = true })
+  vim.keymap.set('n', '<c-p>', ':Explore %:p:h<CR>', { desc = 'Toggle NvimTree', silent = true })
+end
+
 -- Install package manager
 --    https://github.com/folke/lazy.nvim
 --    `:help lazy.nvim.txt` for more info
@@ -404,6 +415,51 @@ require('lazy').setup({
   {
     'nvim-tree/nvim-tree.lua',
     dependencies = { 'nvim-tree/nvim-web-devicons' },
+    enabled = not UseNetrw,
+    config = function()
+      -- disable netrw at the very start of your init.lua
+      vim.g.loaded_netrw = 1
+      vim.g.loaded_netrwPlugin = 1
+      require('nvim-tree').setup {
+        sort = {
+          sorter = 'case_sensitive',
+        },
+        view = {
+          width = 30,
+        },
+        renderer = {
+          group_empty = true,
+        },
+        filters = {
+          dotfiles = true,
+        },
+        disable_netrw = true,
+        update_focused_file = {
+          enable = true,
+        },
+      }
+      vim.keymap.set('n', '<c-p>', function()
+        local tree = require 'nvim-tree.api'
+        tree.tree.toggle()
+        -- vim.cmd(":NvimTreeToggle")
+      end, { desc = 'Toggle NvimTree' })
+
+      -- local function handle_nvim_tree()
+      --   local tree = require 'nvim-tree.api'
+      --   tree.tree.close()
+      -- end
+      -- vim.api.nvim_create_autocmd({ 'VimEnter' }, { callback = handle_nvim_tree })
+      vim.api.nvim_create_autocmd('BufEnter', {
+        group = vim.api.nvim_create_augroup('NvimTreeClose', { clear = true }),
+        pattern = 'NvimTree_*',
+        callback = function()
+          local layout = vim.api.nvim_call_function('winlayout', {})
+          if layout[1] == 'leaf' and vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(layout[2]), 'filetype') == 'NvimTree' and layout[3] == nil then
+            vim.cmd 'confirm quit'
+          end
+        end,
+      })
+    end,
   },
 
   -- LaTex
@@ -1246,49 +1302,6 @@ vim.api.nvim_create_user_command('ToTabs', function(props)
     %s/\s\+$//e
   ]])
 end, { desc = 'Change current buffers indentation to tabs (defaults to 4 spaces)', nargs = '?' })
-
--- disable netrw at the very start of your init.lua
-vim.g.loaded_netrw = 1
-vim.g.loaded_netrwPlugin = 1
-require('nvim-tree').setup {
-  sort = {
-    sorter = 'case_sensitive',
-  },
-  view = {
-    width = 30,
-  },
-  renderer = {
-    group_empty = true,
-  },
-  filters = {
-    dotfiles = true,
-  },
-  disable_netrw = true,
-  update_focused_file = {
-    enable = true,
-  },
-}
-vim.keymap.set('n', '<c-p>', function()
-  local tree = require 'nvim-tree.api'
-  tree.tree.toggle()
-  -- vim.cmd(":NvimTreeToggle")
-end, { desc = 'Toggle NvimTree' })
-
-local function handle_nvim_tree()
-  local tree = require 'nvim-tree.api'
-  tree.tree.close()
-end
-vim.api.nvim_create_autocmd({ 'VimEnter' }, { callback = handle_nvim_tree })
-vim.api.nvim_create_autocmd('BufEnter', {
-  group = vim.api.nvim_create_augroup('NvimTreeClose', { clear = true }),
-  pattern = 'NvimTree_*',
-  callback = function()
-    local layout = vim.api.nvim_call_function('winlayout', {})
-    if layout[1] == 'leaf' and vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(layout[2]), 'filetype') == 'NvimTree' and layout[3] == nil then
-      vim.cmd 'confirm quit'
-    end
-  end,
-})
 
 -- Only use soft-wrapping
 vim.opt.wrap = true
