@@ -394,6 +394,14 @@ require('lazy').setup({
     dependencies = {
       'tpope/vim-repeat',
     },
+    config = function()
+      -- Leap configiration (use the defaults for now)
+      -- NOTE: this is deprecated figure out what to do later
+      -- require('leap').add_default_mappings()
+      vim.keymap.set({ 'n', 'x', 'o' }, 's', '<Plug>(leap-forward)')
+      vim.keymap.set({ 'n', 'x', 'o' }, 'S', '<Plug>(leap-backward)')
+      vim.keymap.set('n', 'gs', '<Plug>(leap-from-window)')
+    end,
   },
 
   { 'norcalli/nvim-colorizer.lua' },
@@ -495,6 +503,7 @@ require('lazy').setup({
         ['*'] = false,
         ['javascript'] = true,
         ['typescript'] = true,
+        ['vue'] = true,
         ['lua'] = true,
         ['rust'] = true,
         ['c'] = true,
@@ -1177,9 +1186,6 @@ if vim.lsp.inlay_hint then
     vim.lsp.inlane_hint(0, nil)
   end, { desc = 'Toggle f[u]nction inlay [H]ints' })
 end
-
--- Leap configiration (use the defaults for now)
-require('leap').add_default_mappings()
 
 local function toggle_listchars()
   -- vim.opt.listchars = { eol = '¬', tab = '>·', trail = '~', extends = '>', precedes = '<', space = '␣' }
