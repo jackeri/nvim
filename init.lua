@@ -44,7 +44,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 vim.g.have_nerd_font = true
 
-UseNetrw = true
+UseNetrw = false
 if UseNetrw then
   vim.g.netrw_keepdir = 0
   vim.g.netrw_banner = 0
@@ -449,20 +449,19 @@ require('lazy').setup({
       vim.keymap.set('n', '<c-p>', function()
         local tree = require 'nvim-tree.api'
         tree.tree.toggle()
-        -- vim.cmd(":NvimTreeToggle")
       end, { desc = 'Toggle NvimTree' })
 
-      -- local function handle_nvim_tree()
-      --   local tree = require 'nvim-tree.api'
-      --   tree.tree.close()
-      -- end
-      -- vim.api.nvim_create_autocmd({ 'VimEnter' }, { callback = handle_nvim_tree })
       vim.api.nvim_create_autocmd('BufEnter', {
         group = vim.api.nvim_create_augroup('NvimTreeClose', { clear = true }),
         pattern = 'NvimTree_*',
         callback = function()
           local layout = vim.api.nvim_call_function('winlayout', {})
-          if layout[1] == 'leaf' and vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(layout[2]), 'filetype') == 'NvimTree' and layout[3] == nil then
+          local window = tonumber(layout[2])
+          if not type(window) == 'number' then
+            return
+          end
+          local type = vim.api.nvim_get_option_value('filetype', { win = window })
+          if layout[1] == 'leaf' and type == 'NvimTree' and layout[3] == nil then
             vim.cmd 'confirm quit'
           end
         end,
