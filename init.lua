@@ -300,11 +300,13 @@ require('lazy').setup({
 
       vim.keymap.set('n', '<leader>gf', builtin.git_files, { desc = 'Search [G]it [F]iles' })
       vim.keymap.set('n', '<leader>sf', function()
-        builtin.find_files { path_display = { 'truncate' } }
+        builtin.find_files { path_display = { 'truncate' }, shorter_path = true }
       end, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
-      vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
+      vim.keymap.set('n', '<leader>sg', function()
+        builtin.live_grep { debounce = 1000 }
+      end, { desc = '[S]earch by [G]rep' })
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
 
@@ -390,10 +392,11 @@ require('lazy').setup({
   { 'mg979/vim-visual-multi' },
 
   {
-    'ggandor/leap.nvim',
+    url = 'https://codeberg.org/andyg/leap.nvim',
     dependencies = {
       'tpope/vim-repeat',
     },
+    enabled = false, -- FIXME: Disable for now, enable when the annoying popup is disabled
     config = function()
       -- Leap configiration (use the defaults for now)
       -- NOTE: this is deprecated figure out what to do later
@@ -773,6 +776,8 @@ vim.keymap.set('n', '<leader>b', require('dap').toggle_breakpoint, { desc = 'Tog
 -- [[ Configure Treesitter ]]
 -- See `:help nvim-treesitter`
 -- Defer Treesitter setup after first render to improve startup time of 'nvim {filename}'
+
+local ts_setup_done = false
 vim.defer_fn(function()
   require('nvim-treesitter.configs').setup {
     -- Add languages to be installed here that you want installed for treesitter
@@ -837,7 +842,32 @@ vim.defer_fn(function()
       },
     },
   }
+  ts_setup_done = true
+  vim.opt.foldmethod = 'expr'
+  vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
 end, 0)
+
+-- Enable the treesitter folding if supported by the current buffer
+vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufReadPost' }, {
+  callback = function()
+    if not ts_setup_done then
+      return
+    end
+    if vim.opt.foldexpr == 'nvim_treesitter#foldexpr()' then
+      return
+    end
+    -- Check if the current buffer has a treesitter highlighter support
+    if vim.treesitter.highlighter.active[vim.api.nvim_get_current_buf()] ~= nil then
+      vim.wo.foldexpr = 'nvim_treesitter#foldexpr()'
+      vim.wo.foldmethod = 'expr'
+      -- vim.schedule(function()
+      --   vim.cmd.normal 'zx' -- update folds
+      -- end)
+    else
+      vim.wo.foldmethod = 'manual'
+    end
+  end,
+})
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
@@ -1226,16 +1256,19 @@ vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufRead' }, {
   -- command = 'set syntax=groovy'
 })
 
--- Enable the treesitter folding if supported by the current buffer
-vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufReadPost' }, {
-  callback = function()
-    -- Check if the current buffer has a treesitter highlighter support
-    if vim.treesitter.highlighter.active[vim.api.nvim_get_current_buf()] ~= nil then
-      vim.wo.foldmethod = 'expr'
-      vim.wo.foldexpr = 'nvim_treesitter#foldexpr()'
-    end
-  end,
-})
+-- vim.api.nvim_create_autocmd('FileType', {
+--   pattern = { '<filetype>' },
+--   callback = function()
+--     vim.treesitter.start()
+--     if vim.treesitter.highlighter.active[vim.api.nvim_get_current_buf()] ~= nil then
+--       vim.wo.foldmethod = 'expr'
+--       vim.wo.foldexpr = 'nvim_treesitter#foldexpr()'
+--     else
+--       vim.wo.foldmethod = 'manual'
+--     end
+--   end,
+-- })
+
 vim.opt.foldlevelstart = 99
 vim.opt.foldenable = true
 

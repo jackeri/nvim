@@ -1,3 +1,19 @@
+local function pint()
+  return {
+    exe = './vendor/bin/pint',
+    -- args = { vim.fn.expand '%:p' },
+    -- stdin = false,
+  }
+end
+
+local function is_pint_available(bufnr)
+  if vim.loop.fs_stat(vim.fn.getcwd() .. '/vendor/bin/pint') then
+    return { 'pint' }
+  else
+    return {}
+  end
+end
+
 local function uncrustify()
   local cwd = vim.fn.getcwd()
   local cfg = cwd .. '/uncrustify.cfg'
@@ -68,9 +84,12 @@ return {
         lua = { 'stylua' },
         java = { lsp_format = 'fallback' },
         rust = { 'rustfmt' },
+        php = is_pint_available,
+        python = { 'black' },
       },
       formatters = {
         uncrustify = uncrustify,
+        pint = pint,
         yamlfmt = {
           command = 'yamlfmt',
           args = { '-formatter', 'retain_line_breaks_single=true,indent=2' },
