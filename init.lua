@@ -396,7 +396,6 @@ require('lazy').setup({
     dependencies = {
       'tpope/vim-repeat',
     },
-    enabled = false, -- FIXME: Disable for now, enable when the annoying popup is disabled
     config = function()
       -- Leap configiration (use the defaults for now)
       -- NOTE: this is deprecated figure out what to do later
