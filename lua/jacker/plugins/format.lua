@@ -86,6 +86,7 @@ return {
         rust = { 'rustfmt' },
         php = is_pint_available,
         python = { 'black' },
+        odin = { 'odinfmt' },
       },
       formatters = {
         uncrustify = uncrustify,
@@ -96,6 +97,12 @@ return {
           condition = function()
             return vim.fn.executable 'yamlfmt' == 1
           end,
+        },
+        odinfmt = {
+          -- Change where to find the command if it isn't in your path.
+          command = 'odinfmt',
+          args = { '-stdin' },
+          stdin = true,
         },
       },
       format_on_save = {
