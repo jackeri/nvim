@@ -1838,6 +1838,7 @@ if vim.g.neovide then
     local default_path = vim.fn.expand '~/programming'
     notify('Setting default directory to ' .. default_path, vim.log.levels.INFO)
     vim.api.nvim_set_current_dir(default_path)
+    vim.g.neovide_input_macos_option_key_is_meta = 'only-left'
   end
   vim.g.neovide_scale_factor = 1.1
 end
