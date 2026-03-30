@@ -523,6 +523,8 @@ require('lazy').setup({
         -- vim.fn['copilot#Accept'] '<CR>'
         vim.fn.feedkeys(vim.fn['copilot#Accept'] '<CR>', '')
       end, { silent = true })
+      vim.keymap.set('i', '<C-L>', '<Plug>(copilot-next)')
+      vim.keymap.set('i', '<C-K>', '<Plug>(copilot-previous)')
     end,
     enabled = function()
       -- Only enable copilot if node is version 18 or greater
