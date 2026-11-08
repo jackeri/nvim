@@ -44,6 +44,7 @@ return {
   {
     'folke/todo-comments.nvim',
     dependencies = { 'nvim-lua/plenary.nvim' },
+    event = 'VeryLazy', -- load on startup so TODO/FIXME highlighting is active immediately, not only after pressing one of the keys below
     opts = {},
     keys = {
       {
