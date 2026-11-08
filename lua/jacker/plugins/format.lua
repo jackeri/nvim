@@ -7,7 +7,7 @@ local function pint()
 end
 
 local function is_pint_available(bufnr)
-  if vim.loop.fs_stat(vim.fn.getcwd() .. '/vendor/bin/pint') then
+  if vim.uv.fs_stat(vim.fn.getcwd() .. '/vendor/bin/pint') then
     return { 'pint' }
   else
     return {}
@@ -17,7 +17,7 @@ end
 local function uncrustify()
   local cwd = vim.fn.getcwd()
   local cfg = cwd .. '/uncrustify.cfg'
-  -- if vim.loop.fs_stat(cfg) then
+  -- if vim.uv.fs_stat(cfg) then
   -- print('Setting the uncrustify config to: ' .. cfg)
   -- end
   return {
@@ -29,7 +29,7 @@ local function uncrustify()
       return { '-c', cfg, '-l', vim.bo[ctx.buf].filetype:upper() }
     end,
     condition = function(_)
-      return vim.fn.executable 'uncrustify' == 1 and vim.loop.fs_stat(cfg)
+      return vim.fn.executable 'uncrustify' == 1 and vim.uv.fs_stat(cfg)
     end,
     -- stdin = false,
     -- inherit = true,
