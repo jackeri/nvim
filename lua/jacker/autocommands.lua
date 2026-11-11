@@ -24,15 +24,6 @@ vim.api.nvim_create_autocmd({ 'BufReadPost' }, {
   end,
 })
 
--- Use groovy as the default Jenkinsfile syntax
-vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufRead' }, {
-  pattern = { 'Jenkinsfile' },
-  callback = function(_)
-    vim.notify('Jenkinsfile detected', vim.log.levels.INFO)
-    vim.o.syntax = 'groovy'
-  end,
-})
-
 vim.filetype.add {
   extension = {
     vert = 'glsl',
@@ -41,6 +32,9 @@ vim.filetype.add {
     tesc = 'glsl',
     tese = 'glsl',
     comp = 'glsl',
+  },
+  filename = {
+    Jenkinsfile = 'groovy',
   },
   pattern = {
     ['.*/.gitconfig-*'] = 'gitconfig',

@@ -146,12 +146,45 @@ end
 
 -- Setup the LTeX language server if it's installed
 local function setup_ltex(mason_registry)
-  if not mason_registry.is_installed 'ltex' then
+  -- The nvim-lspconfig/vim.lsp server name is "ltex", but the Mason package
+  -- name is "ltex-ls" -- checking is_installed('ltex') always returns false
+  -- and silently skips this whole function.
+  if not mason_registry.is_installed 'ltex-ls' then
     return
   end
 
   vim.lsp.config('ltex', {
-    filetypes = { 'markdown', 'text', 'tex', 'bib' },
+    -- vim.lsp.config() replaces (rather than merges) array fields, so this
+    -- list must restate nvim-lspconfig's full default filetype set
+    -- (lsp/ltex.lua) instead of narrowing it -- otherwise ltex silently
+    -- never attaches for e.g. gitcommit/org/plaintext/html buffers.
+    filetypes = {
+      'bib',
+      'gitcommit',
+      'markdown',
+      'org',
+      'plaintex',
+      'rst',
+      'rnoweb',
+      'tex',
+      'pandoc',
+      'quarto',
+      'rmd',
+      'context',
+      'html',
+      'xhtml',
+      'mail',
+      'text',
+    },
+    -- ltex-ls bundles its own JDK 11 and always boots the local LanguageTool
+    -- engine (even when languageToolHttpServerUri is set), which activates
+    -- its English rule set (grammar.xml) using the default JAXP
+    -- entity-expansion limit. That file's internal entity expansions exceed
+    -- the JDK default of 100000, crashing with
+    -- "Could not activate rules" / "JAXP00010004 ... totalEntitySizeLimit".
+    -- Raise/disable the limit via JAVA_OPTS, which ltex-ls's launch script
+    -- forwards straight to its JVM invocation.
+    cmd_env = { JAVA_OPTS = '-Djdk.xml.totalEntitySizeLimit=0' },
     settings = {
       ltex = {
         languageToolHttpServerUri = 'https://api.languagetoolplus.com',

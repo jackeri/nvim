@@ -14,6 +14,59 @@ local function find_format_file(cwd, file)
   return cfgPath
 end
 
+-- JDTLS persists its project model/index in a per-project "workspace"
+-- directory (the `-data` arg). That cache is only compatible with the
+-- jdtls build that created it and can corrupt itself if the process is
+-- killed mid-write, so we (a) version the workspace path by the installed
+-- jdtls version to avoid reusing an incompatible cache after a Mason
+-- update, and (b) quarantine the workspace automatically if jdtls ever
+-- exits abnormally, so a corrupted cache can't keep crashing it forever.
+local function get_jdtls_version(mason_packages_path)
+  local receipt_path = mason_packages_path .. '/jdtls/mason-receipt.json'
+  local ok, lines = pcall(vim.fn.readfile, receipt_path)
+  if not ok or not lines or #lines == 0 then
+    return nil
+  end
+  local decode_ok, receipt = pcall(vim.json.decode, table.concat(lines, '\n'))
+  if not decode_ok or type(receipt) ~= 'table' then
+    return nil
+  end
+  local id = receipt.source and receipt.source.raw and receipt.source.raw.id
+  if type(id) == 'string' then
+    return id:match '@(.+)$'
+  end
+  return nil
+end
+
+local function quarantine_workspace(workspace_folder, code)
+  if not vim.uv.fs_stat(workspace_folder) then
+    return
+  end
+  local backup = workspace_folder .. '.corrupted-' .. os.time()
+  local renamed = os.rename(workspace_folder, backup)
+  vim.schedule(function()
+    if renamed then
+      vim.notify(
+        string.format(
+          'jdtls exited abnormally (code %d). Its workspace cache was moved to %s so it can rebuild a fresh one. Reopen the Java buffer to restart it.',
+          code,
+          backup
+        ),
+        vim.log.levels.WARN
+      )
+    else
+      vim.notify(
+        string.format(
+          'jdtls exited abnormally (code %d) and its workspace cache at %s may be corrupted. Delete it manually if problems persist.',
+          code,
+          workspace_folder
+        ),
+        vim.log.levels.WARN
+      )
+    end
+  end)
+end
+
 local function parse_jdk_version(path)
   local jdk_rel = vim.fn.glob(path .. '/release')
   if vim.uv.fs_stat(jdk_rel) then
@@ -62,19 +115,29 @@ function M.setup(mason_registry, capabilities)
   local java_paths = {}
 
   if vim.fn.has 'macunix' == 1 then
-    local vms = vim.fn.expand '/Library/Java/JavaVirtualMachines/*/Contents/Home'
-    local highest_jvm = -1
-    for jdk in vms:gmatch '[^\r\n]+' do
-      local jdk_version = parse_jdk_version(jdk)
+    -- Scan both system-wide and per-user JVM install locations, since JDKs
+    -- installed by IDEs/tools often only show up under the user's home dir.
+    local home = os.getenv 'HOME'
+    local vm_globs = { '/Library/Java/JavaVirtualMachines/*/Contents/Home' }
+    if home and string.len(home) > 0 then
+      table.insert(vm_globs, home .. '/Library/Java/JavaVirtualMachines/*/Contents/Home')
+    end
 
-      if jdk_version then
-        if jdk_version > highest_jvm then
-          highest_jvm = jdk_version
+    local highest_jvm = -1
+    for _, vm_glob in ipairs(vm_globs) do
+      local vms = vim.fn.expand(vm_glob)
+      for jdk in vms:gmatch '[^\r\n]+' do
+        local jdk_version = parse_jdk_version(jdk)
+
+        if jdk_version then
+          if jdk_version > highest_jvm then
+            highest_jvm = jdk_version
+          end
+          table.insert(java_paths, {
+            name = 'Java-' .. jdk_version,
+            path = jdk,
+          })
         end
-        table.insert(java_paths, {
-          name = 'Java-' .. jdk_version,
-          path = jdk,
-        })
       end
     end
 
@@ -107,8 +170,10 @@ function M.setup(mason_registry, capabilities)
       java_version = parse_jdk_version(java_home)
     end
 
-    -- JDTLS requires Java 21 or higher
-    if java_version and java_version > 20 then
+    -- The Mason-installed JDTLS build requires Java 25 or higher to boot
+    -- (its OSGi framework declares osgi.ee=JavaSE;version=25); older JDKs
+    -- cause it to exit immediately with code 13.
+    if java_version and java_version >= 25 then
       return
     end
 
@@ -122,8 +187,8 @@ function M.setup(mason_registry, capabilities)
       end
     end
 
-    if java_version == nil or java_version < 21 then
-      vim.notify('No valid JDK(version >= 21) found, please set JAVA_HOME', vim.log.levels.ERROR)
+    if java_version == nil or java_version < 25 then
+      vim.notify('No valid JDK(version >= 25) found, please set JAVA_HOME', vim.log.levels.ERROR)
       return
     end
   end
@@ -160,16 +225,24 @@ function M.setup(mason_registry, capabilities)
 
   local home = os.getenv 'HOME'
   local root_dir = vim.fs.dirname(vim.fs.find({ 'mvnw', 'gradlew', 'pom.xml', 'build.gradle' }, { upward = true })[1])
-  local workspace_folder = home .. '/.local/share/eclipse/' .. vim.fn.fnamemodify(root_dir, ':p:h:t')
+  local mason_packages = vim.fn.expand '$MASON/packages'
+  local jdtls_version = get_jdtls_version(mason_packages)
+  local workspace_folder = home .. '/.local/share/eclipse/' .. vim.fn.fnamemodify(root_dir, ':p:h:t') .. (jdtls_version and ('-' .. jdtls_version) or '')
 
   vim.lsp.config('jdtls', {
     capabilities = capabilities,
 
+    on_exit = function(code, _, _)
+      if code ~= 0 then
+        quarantine_workspace(workspace_folder, code)
+      end
+    end,
+
     cmd = {
-      vim.fn.expand '$MASON/packages' .. '/jdtls/bin/jdtls',
+      mason_packages .. '/jdtls/bin/jdtls',
       '-data',
       workspace_folder,
-      '--jvm-arg=-javaagent:' .. vim.fn.expand '$MASON/packages' .. '/jdtls/lombok.jar',
+      '--jvm-arg=-javaagent:' .. mason_packages .. '/jdtls/lombok.jar',
       '--jvm-arg=-Xmx1G',
       '--jvm-arg=-XX:+UseG1GC',
       '--jvm-arg=-XX:+UseStringDeduplication',
