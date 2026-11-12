@@ -34,10 +34,13 @@ return {
   },
 
   {
-    'norcalli/nvim-colorizer.lua',
+    'catgoose/nvim-colorizer.lua',
     config = function()
       -- Enable colorizer for all files and enable the rbg and hex parsing
-      require('colorizer').setup({ '*' }, { rgb_fn = true, RRGGBBAA = true })
+      require('colorizer').setup({
+        filetypes = { '*' },
+        user_default_options = { rgb_fn = true, RRGGBBAA = true },
+      })
     end,
   },
 
