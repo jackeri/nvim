@@ -4,7 +4,9 @@ return {
     'navarasu/onedark.nvim',
     priority = 1000,
     config = function()
-      vim.cmd.colorscheme 'onedark'
+      -- setup() populates vim.g.onedark_config, which the lualine onedark theme requires
+      require('onedark').setup {}
+      require('onedark').load()
     end,
   },
 

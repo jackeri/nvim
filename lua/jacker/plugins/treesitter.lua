@@ -5,7 +5,8 @@ return {
     branch = 'main',
     lazy = false,
     dependencies = {
-      'nvim-treesitter/nvim-treesitter-textobjects',
+      -- must track `main` to match nvim-treesitter's `main` branch (`master` requires the removed `nvim-treesitter.configs`)
+      { 'nvim-treesitter/nvim-treesitter-textobjects', branch = 'main' },
     },
     build = ':TSUpdate',
     config = function()
@@ -65,50 +66,51 @@ return {
         end,
       })
 
+      -- nvim-treesitter-textobjects (main branch): setup only takes options, keymaps are defined manually
       require('nvim-treesitter-textobjects').setup {
         select = {
-          enable = true,
           lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
-          keymaps = {
-            -- You can use the capture groups defined in textobjects.scm
-            ['aa'] = '@parameter.outer',
-            ['ia'] = '@parameter.inner',
-            ['af'] = '@function.outer',
-            ['if'] = '@function.inner',
-            ['ac'] = '@class.outer',
-            ['ic'] = '@class.inner',
-          },
         },
         move = {
-          enable = true,
           set_jumps = true, -- whether to set jumps in the jumplist
-          goto_next_start = {
-            [']m'] = '@function.outer',
-            [']]'] = '@class.outer',
-          },
-          goto_next_end = {
-            [']M'] = '@function.outer',
-            [']['] = '@class.outer',
-          },
-          goto_previous_start = {
-            ['[m'] = '@function.outer',
-            ['[['] = '@class.outer',
-          },
-          goto_previous_end = {
-            ['[M'] = '@function.outer',
-            ['[]'] = '@class.outer',
-          },
-        },
-        swap = {
-          enable = true,
-          swap_next = {
-            ['<leader>a'] = '@parameter.inner',
-          },
-          swap_previous = {
-            ['<leader>A'] = '@parameter.inner',
-          },
         },
       }
+
+      local ts_select = require 'nvim-treesitter-textobjects.select'
+      for lhs, query in pairs {
+        ['aa'] = '@parameter.outer',
+        ['ia'] = '@parameter.inner',
+        ['af'] = '@function.outer',
+        ['if'] = '@function.inner',
+        ['ac'] = '@class.outer',
+        ['ic'] = '@class.inner',
+      } do
+        vim.keymap.set({ 'x', 'o' }, lhs, function()
+          ts_select.select_textobject(query, 'textobjects')
+        end, { desc = 'Select ' .. query })
+      end
+
+      local ts_move = require 'nvim-treesitter-textobjects.move'
+      for fn, maps in pairs {
+        goto_next_start = { [']m'] = '@function.outer', [']]'] = '@class.outer' },
+        goto_next_end = { [']M'] = '@function.outer', [']['] = '@class.outer' },
+        goto_previous_start = { ['[m'] = '@function.outer', ['[['] = '@class.outer' },
+        goto_previous_end = { ['[M'] = '@function.outer', ['[]'] = '@class.outer' },
+      } do
+        for lhs, query in pairs(maps) do
+          vim.keymap.set({ 'n', 'x', 'o' }, lhs, function()
+            ts_move[fn](query, 'textobjects')
+          end, { desc = fn .. ' ' .. query })
+        end
+      end
+
+      local ts_swap = require 'nvim-treesitter-textobjects.swap'
+      vim.keymap.set('n', '<leader>a', function()
+        ts_swap.swap_next '@parameter.inner'
+      end, { desc = 'Swap next parameter' })
+      vim.keymap.set('n', '<leader>A', function()
+        ts_swap.swap_previous '@parameter.inner'
+      end, { desc = 'Swap previous parameter' })
     end,
   },
 
